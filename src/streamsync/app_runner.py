@@ -1,6 +1,7 @@
 import multiprocessing
 import multiprocessing.synchronize
 import multiprocessing.connection
+import pkgutil
 import signal
 import threading
 import asyncio
@@ -11,6 +12,7 @@ import os
 import sys
 import logging
 import logging.handlers
+from importlib.machinery import FileFinder
 from types import ModuleType
 import json
 from typing import Any, Callable, Dict, List, Optional, cast
@@ -18,7 +20,7 @@ from typing import Any, Callable, Dict, List, Optional, cast
 from watchdog.observers.polling import PollingObserver
 
 from pydantic import ValidationError
-from streamsync.core import StreamsyncSession
+from streamsync.core import StreamsyncSession, ExtensionManager
 from streamsync.ss_types import (AppProcessServerRequest, AppProcessServerRequestPacket, AppProcessServerResponse, AppProcessServerResponsePacket, ComponentUpdateRequest, ComponentUpdateRequestPayload,
                                  EventRequest, EventResponsePayload, InitSessionRequest, InitSessionRequestPayload, InitSessionResponse, InitSessionResponsePayload, StateEnquiryRequest, StateEnquiryResponsePayload, StreamsyncEvent)
 import watchdog.observers
@@ -80,7 +82,7 @@ class AppProcess(multiprocessing.Process):
         self.run_code = run_code
         self.bmc_components = bmc_components
         self.is_app_process_server_ready = is_app_process_server_ready
-        self.is_app_process_server_failed = is_app_process_server_failed 
+        self.is_app_process_server_failed = is_app_process_server_failed
         self.logger = logging.getLogger("app")
 
 
@@ -548,6 +550,7 @@ class AppRunner:
         self.log_listener: Optional[LogListener] = None
         self.code_update_loop: Optional[asyncio.AbstractEventLoop] = None
         self.code_update_condition: Optional[asyncio.Condition] = None
+        self.extension_manager: Optional[ExtensionManager] = None
 
         if mode not in ("edit", "run"):
             raise ValueError("Invalid mode.")
@@ -590,6 +593,7 @@ class AppRunner:
 
         self.run_code = self._load_persisted_script()
         self.bmc_components = self._load_persisted_components()
+        self.extension_manager = self._load_extensions()
 
         if self.mode == "edit":
             self._set_observer()
@@ -629,6 +633,19 @@ class AppRunner:
             raise PermissionError("Message mismatch.")
 
         return response
+
+    def _load_extensions(self):
+        extension_manager = ExtensionManager()
+
+        # Go through all packages installed in python and extract those that start with streamsync_
+        modules = list(pkgutil.iter_modules())
+        modules_paths = []
+        for module in modules:
+            if isinstance(module.module_finder, FileFinder):
+                modules_paths.append(os.path.join(module.module_finder.path, module.name))
+
+        extension_manager.load_extensions(self.app_path, modules_paths)
+        return extension_manager
 
     def _load_persisted_script(self) -> str:
         try:
