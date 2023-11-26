@@ -1,10 +1,13 @@
 import asyncio
 import dataclasses
 import mimetypes
+import pkgutil
 from contextlib import asynccontextmanager
 import sys
 import textwrap
-from typing import Any, Callable, Dict, List, Optional, Set, Union
+from importlib.machinery import FileFinder
+from typing import Any, Callable, Dict, List, Optional, Set, Union, Tuple
+
 import typing
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -12,6 +15,8 @@ from pydantic import ValidationError
 from fastapi.routing import Mount
 from starlette.responses import FileResponse
 from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
+
+from streamsync.core import Logger
 from streamsync.ss_types import (AppProcessServerResponse, ComponentUpdateRequestPayload, EventResponsePayload, InitRequestBody, InitResponseBodyEdit,
                                  InitResponseBodyRun, InitSessionRequestPayload, InitSessionResponsePayload, ServeMode, StateEnquiryResponsePayload, StreamsyncEvent, StreamsyncWebsocketIncoming, StreamsyncWebsocketOutgoing)
 import os
@@ -36,17 +41,22 @@ def get_asgi_app(
 
     _fix_mimetype()
     app_runner = AppRunner(user_app_path, serve_mode)
+    extension_manager = ExtensionManager()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        nonlocal app_runner
+        nonlocal app_runner, extension_manager
 
         app_runner.hook_to_running_event_loop()
         app_runner.load()
 
+
+        modules_paths = _list_python_module_paths()
+        extension_manager.load_extensions(app_runner.app_path, modules_paths)
+
         if on_load is not None \
-           and hasattr(app.state, 'is_server_static_mounted') \
-           and app.state.is_server_static_mounted:
+            and hasattr(app.state, 'is_server_static_mounted') \
+            and app.state.is_server_static_mounted:
             on_load()
 
         try:
@@ -78,7 +88,7 @@ def get_asgi_app(
     # Init
 
     def _get_run_starter_pack(payload: InitSessionResponsePayload):
-        extensions_assets_urls = app_runner.extension_manager.extensions_assets_urls()
+        extensions_assets_urls = extension_manager.extensions_assets_urls()
 
         return InitResponseBodyRun(
             mode="run",
@@ -92,7 +102,7 @@ def get_asgi_app(
 
     def _get_edit_starter_pack(payload: InitSessionResponsePayload):
         run_code: Optional[str] = app_runner.run_code
-        extensions_assets_urls = app_runner.extension_manager.extensions_assets_urls()
+        extensions_assets_urls = extension_manager.extensions_assets_urls()
 
         return InitResponseBodyEdit(
             mode="edit",
@@ -349,7 +359,7 @@ def get_asgi_app(
 
     @asgi_app.get("/extensions/{extension_path:path}")
     async def get_extension(extension_path: str):
-        asset_path = app_runner.extension_manager.extension_asset_from_url(extension_path)
+        asset_path = extension_manager.extension_asset_from_url(extension_path)
 
         if asset_path is None:
             raise HTTPException(status_code=404)
@@ -478,6 +488,126 @@ async def _lifespan_invoke(context: list, app: FastAPI):
                 yield
         else:
             yield
+
+class ExtensionManager:
+    """
+    This manager manages streamsync extensions. It takes care of loading them when the application starts.
+    """
+
+    def __init__(self) -> None:
+        # fills when calling self.load_extensions
+        self.extensions: Optional[List[Tuple[Optional[str], str]]] = None
+
+    def load_extensions(self, user_app_path: str, modules_path: List[str]) -> None:
+        extensions: List[Tuple[Optional[str], str]] = []
+
+        for module_path in modules_path:
+            module_name: str = os.path.basename(module_path)
+            if module_name.startswith('streamsync_') and os.path.isdir(os.path.join(module_path, "extensions")):
+                extension_name = os.path.basename(module_path)
+                extension_path = os.path.realpath(os.path.join(module_path, "extensions"))
+                Logger.debug('Loading streamsync packages extension "%s" from "%s"', extension_name, extension_path)
+                extensions.append((extension_name, extension_path))
+
+        user_app_extensions_path = os.path.realpath(os.path.join(user_app_path, "extensions"))
+        if os.path.isdir(user_app_extensions_path):
+            Logger.debug(f'Loading user app extensions from "{user_app_extensions_path}"')
+            extensions.append((None, user_app_extensions_path))
+
+        # The order of loading the extensions is in the reverse order of the packages exposed by pkgutil
+        # The user's extensions are loaded last, and therefore overwrite the extensions.
+        #
+        # If 2 versions of an extension are present, the version of the virtual environment will be used.
+        self.extensions = list(reversed(extensions))
+
+    def extensions_list(self) -> List[Optional[str]]:
+        assert self.extensions is not None, 'Extensions must be loaded before calling this ExtensionManager.extensions_list'
+
+        return [extension[0] for extension in self.extensions]
+
+    def extensions_assets_urls(self) -> List[str]:
+        assert self.extensions is not None, 'Extensions must be loaded before calling this ExtensionManager.extensions_assets'
+
+        all_assets = []
+        extensions = self.extensions_list()
+        for extension in extensions:
+            all_assets += self.extension_assets_urls(extension)
+
+        return all_assets
+
+    def extension_assets_urls(self, extension_id: Optional[str]) -> List[str]:
+        """
+        Returns the urls of assets installed in an extension. Assets are the .css and .js files that package a component.
+
+        If the assets come from user space, the url is composed of 'filename'
+        If the assets come from a packaged extension, the url is composed of 'extension_package/filename'
+        """
+        assert self.extensions is not None, 'Extensions must be loaded before calling this ExtensionManager.extension_assets_urls'
+
+        assets_extensions = ['.css', '.js']
+        extension_path = [extension[1] for extension in self.extensions if extension[0] == extension_id]
+        if len(extension_path) > 1:
+            Logger.warning('Multiple extensions path with the same id %s', extension_path)
+
+        if len(extension_path) == 0:
+            return []
+
+        _extension_path = extension_path[0]
+        assets = [elt for elt in os.listdir(_extension_path) if os.path.splitext(elt)[1] in assets_extensions]
+
+        if extension_id is None:
+            # Handles the case of user extensions
+            return [f'{asset}' for asset in assets]
+        else:
+            # Handles the case of packaged extensions installed with pip
+            return [f'{extension_id}/{asset}' for asset in assets]
+
+    def extension_asset_from_url(self, url: str) -> Optional[str]:
+        """
+        Returns the asset name from an url.
+        """
+        assert self.extensions is not None, 'Extensions must be loaded before calling this ExtensionManager.extension_asset_from_url'
+
+        url_parts = url.split('/')
+        if len(url_parts) == 1:
+            extension_id = None
+            asset_file = url_parts[0]
+        elif len(url_parts) == 2:
+            extension_id, asset_file = url_parts
+        else:
+            Logger.warning('Application requests invalid asset url %s', url)
+            return None
+
+        extension_path = [extension[1] for extension in self.extensions if extension[0] == extension_id]
+        if len(extension_path) > 1:
+            Logger.warning('Multiple extensions path with the same id %s', extension_path)
+
+        if len(extension_path) == 0:
+            Logger.warning('Extension is missing: %s', extension_id)
+            return None
+
+        _extension_path = extension_path[0]
+        asset_path = os.path.join(_extension_path, asset_file)
+        if not os.path.isfile(asset_path):
+            Logger.warning('Asset is missing: %s', asset_path)
+            return None
+
+        return asset_path
+
+
+def _list_python_module_paths() -> List[str]:
+    """
+    Returns the list of paths of all library modules accessible by the Python runtime
+
+    """
+    modules = list(pkgutil.iter_modules())
+    modules_paths = []
+    for module in modules:
+        if isinstance(module.module_finder, FileFinder):
+            modules_paths.append(os.path.join(module.module_finder.path, module.name))
+
+    return modules_paths
+
 
 def _fix_mimetype():
     """
