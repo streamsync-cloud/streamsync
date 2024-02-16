@@ -1,7 +1,16 @@
 <template>
 	<div class="CoreFileInput" ref="rootEl">
-		<div class="inputContainer" v-if="!processingFiles">
-			<label>{{ fields.label.value }}</label>
+		<div
+			class="inputContainer"
+			v-if="!processingFiles"
+			@dragover.prevent="handleDragOver"
+			@drop.prevent="handleDrop"
+			@dragleave="isFileHover = false"
+			:class="{ fileHover: isFileHover }"
+		>
+			<label @click="fileEl.click">{{
+				isFileHover ? "Click or Drop File" : "Click or Drop File"
+			}}</label>
 			<input
 				type="file"
 				ref="fileEl"
@@ -10,8 +19,13 @@
 			/>
 		</div>
 		<div class="status" v-if="message || processingFiles">
-			<LoadingSymbol class="loadingSymbol" v-if="processingFiles"></LoadingSymbol>
-			<span v-if="processingFiles">Processing {{ processingFiles.join(", ") }}...</span>
+			<LoadingSymbol
+				class="loadingSymbol"
+				v-if="processingFiles"
+			></LoadingSymbol>
+			<span v-if="processingFiles"
+				>Processing {{ processingFiles.join(", ") }}...</span
+			>
 			<span v-if="message">{{ message }}</span>
 		</div>
 	</div>
@@ -40,36 +54,36 @@ def onchange_handler(state, payload):
             file_handle.write(file_data)`.trim();
 
 export default {
-    streamsync: {
-        name: "File Input",
-        description,
-        category: "Input",
-        fields: {
-            label: {
-                name: "Label",
-                init: "Input Label",
-                type: FieldType.Text,
-            },
-            allowMultipleFiles: {
-                name: "Allow multiple files",
-                default: "no",
-                type: FieldType.Text,
-                options: {
-                    yes: "Yes",
-                    no: "No",
-                },
-            },
-            cssClasses
-        },
-        events: {
-            "ss-file-change": {
-                desc: "Capture changes to this control.",
-                stub: onChangeHandlerStub,
-                bindable: true,
-            },
-        },
-    },
-    components: { LoadingSymbol }
+	streamsync: {
+		name: "File Input",
+		description,
+		category: "Input",
+		fields: {
+			label: {
+				name: "Label",
+				init: "Input Label",
+				type: FieldType.Text,
+			},
+			allowMultipleFiles: {
+				name: "Allow multiple files",
+				default: "no",
+				type: FieldType.Text,
+				options: {
+					yes: "Yes",
+					no: "No",
+				},
+			},
+			cssClasses,
+		},
+		events: {
+			"ss-file-change": {
+				desc: "Capture changes to this control.",
+				stub: onChangeHandlerStub,
+				bindable: true,
+			},
+		},
+	},
+	components: { LoadingSymbol },
 };
 </script>
 
@@ -82,16 +96,30 @@ import { useFormValueBroker } from "../../renderer/useFormValueBroker";
 const fields = inject(injectionKeys.evaluatedFields);
 const rootEl: Ref<HTMLInputElement> = ref(null);
 const fileEl: Ref<HTMLInputElement> = ref(null);
-const message:Ref<string> = ref(null);
+const message: Ref<string> = ref(null);
 const ss = inject(injectionKeys.core);
 const instancePath = inject(injectionKeys.instancePath);
-const processingFiles:Ref<string[]> = ref(null);
-
+const processingFiles: Ref<string[]> = ref(null);
+const isFileHover: Ref<boolean> = ref(false);
 const { formValue, handleInput } = useFormValueBroker(ss, instancePath, rootEl);
 
 const allowMultipleFilesFlag = computed(() => {
 	return fields.allowMultipleFiles.value == "yes" ? true : undefined;
 });
+
+// Event handlers for drag-and-drop
+const handleDragOver = (event: DragEvent) => {
+	event.preventDefault();
+	isFileHover.value = true;
+};
+
+const handleDrop = (event: DragEvent) => {
+	event.preventDefault();
+	isFileHover.value = false;
+
+	const files = event.dataTransfer.files;
+	handlefiles(files);
+};
 
 const encodeFile = async (file: File) => {
 	var reader = new FileReader();
@@ -105,13 +133,18 @@ const encodeFile = async (file: File) => {
 
 const fileChange = async (ev: InputEvent) => {
 	const el = ev.target as HTMLInputElement;
-	if (!el.files || el.files.length == 0) return;
+	handlefiles(el.files);
+};
+
+const handlefiles = async (Files: FileList) => {
+	if (!Files || Files.length == 0) return;
+	window.alert("handlefiles");
 
 	const getValue = async () => {
 		let accumSize = 0;
 		message.value = null;
 		const encodedFiles = Promise.all(
-			Array.from(el.files).map(async (f) => {
+			Array.from(Files).map(async (f) => {
 				accumSize += f.size;
 				const fileItem = {
 					name: f.name,
@@ -119,16 +152,18 @@ const fileChange = async (ev: InputEvent) => {
 					data: await encodeFile(f),
 				};
 				return fileItem;
-			})
+			}),
 		);
 		if (accumSize > MAX_FILE_SIZE) {
-			message.value = `Files are too big. Total size limit is ${ Math.floor((MAX_FILE_SIZE/Math.pow(1024, 2))) }mb.`; 
+			message.value = `Files are too big. Total size limit is ${Math.floor(
+				MAX_FILE_SIZE / Math.pow(1024, 2),
+			)}mb.`;
 			return [];
 		}
 		return encodedFiles;
 	};
 
-	processingFiles.value = Array.from(el.files).map(file => file.name);
+	processingFiles.value = Array.from(Files).map((file) => file.name);
 	formValue.value = getValue();
 
 	const customCallback = () => {
@@ -150,21 +185,52 @@ watch(formValue, (newValue: string) => {
 
 .CoreFileInput {
 	width: 100%;
+	aspect-ratio: 16 / 9;
 	display: flex;
 	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
 	gap: 16px;
+	padding: 16px;
+	border: 1px solid var(--separatorColor);
+	border-radius: 8px;
+	box-shadow: var(--containerShadow);
+	background-color: var(--containerBackgroundColor);
+}
+
+.inputContainer {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 label {
 	display: block;
 	margin-bottom: 8px;
+	border-radius: 0.1rem;
+	padding: 1rem;
+	border: 1px solid var(--separatorColor);
+	cursor: pointer;
+}
+
+label:hover {
+	background-color: var(--separatorColor);
 }
 
 input {
 	max-width: 70ch;
 	width: 100%;
 	margin: 0;
-	border: 1px solid var(--separatorColor);
+	display: none;
+}
+
+.fileHover {
+	background-color: lightblue;
+	/* Change to your desired hover color */
 }
 
 .status {
