@@ -43,6 +43,7 @@ export default {
 		name: "Sidebar",
 		description,
 		positionless: true,
+		slot: "sidebar",
 		allowedParentTypes: ["page"],
 		allowedChildrenTypes: ["*"],
 		category: "Layout",

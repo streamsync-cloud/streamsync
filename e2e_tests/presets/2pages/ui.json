@@ -1,0 +1,39 @@
+{
+    "metadata": {
+        "streamsync_version": "0.3.0"
+    },
+    "components": {
+        "root": {
+            "id": "root",
+            "type": "root",
+            "content": {
+                "appName": "My App"
+            },
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "qlbz49xq2emx9ip4": {
+            "id": "qlbz49xq2emx9ip4",
+            "type": "page",
+            "content": {
+                "key": "page1"
+            },
+            "position": 0,
+            "parentId": "root",
+            "handlers": {},
+            "visible": true
+        },
+        "6gnhb317w7k76uhw": {
+            "id": "6gnhb317w7k76uhw",
+            "type": "page",
+            "parentId": "root",
+            "content": {
+                "key": "page2"
+            },
+            "handlers": {},
+            "position": 1,
+            "visible": true
+        }
+    }
+}

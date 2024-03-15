@@ -1,4 +1,5 @@
 import { Ref, ref } from "vue";
+import { getClosestComponent } from "./helpers";
 import { Core, Component } from "../streamsyncTypes";
 import { CANDIDATE_CONFIRMATION_DELAY_MS } from "./builderManager";
 
@@ -44,9 +45,9 @@ export function useDragDropComponent(ss: Core) {
 	function getIdFromElement(el: HTMLElement) {
 		// Elements inside a cage aren't taken into account for insertion
 
-		const cageEl = el.closest("[data-streamsync-cage]");
+		const cageEl = getClosestComponent(el, "[data-streamsync-cage]");
 		const startEl = cageEl ?? el;
-		const targetEl: HTMLElement = startEl.closest("[data-streamsync-id]");
+		const targetEl: HTMLElement = getClosestComponent(startEl, "[data-streamsync-id]");
 		if (!targetEl) return;
 		return targetEl.dataset.streamsyncId;
 	}

@@ -134,6 +134,7 @@ import BuilderInstanceTracker from "./BuilderInstanceTracker.vue";
 import BuilderInsertionOverlay from "./BuilderInsertionOverlay.vue";
 import BuilderInsertionLabel from "./BuilderInsertionLabel.vue";
 import { isPlatformMac } from "../core/detectPlatform";
+import { getClosestComponent } from "./helpers";
 
 const ss = inject(injectionKeys.core);
 const ssbm = inject(injectionKeys.builderManager);
@@ -252,7 +253,8 @@ function handleRendererDrop(ev: DragEvent) {
 function handleRendererClick(ev: PointerEvent): void {
 	if (builderMode.value === "preview") return;
 
-	const targetEl: HTMLElement = (ev.target as HTMLElement).closest(
+	const targetEl: HTMLElement = getClosestComponent(
+		ev.target as HTMLElement,
 		"[data-streamsync-id]",
 	);
 	if (!targetEl) return;
@@ -268,7 +270,8 @@ function handleRendererClick(ev: PointerEvent): void {
 const handleRendererDragStart = (ev: DragEvent) => {
 	if (builderMode.value === "preview") return;
 
-	const targetEl: HTMLElement = (ev.target as HTMLElement).closest(
+	const targetEl: HTMLElement = getClosestComponent(
+		ev.target as HTMLElement,
 		"[data-streamsync-id]",
 	);
 

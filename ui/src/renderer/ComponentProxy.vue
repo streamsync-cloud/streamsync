@@ -14,12 +14,17 @@ import { VNode } from "vue";
 import ChildlessPlaceholder from "./ChildlessPlaceholder.vue";
 
 export default {
-	props: ["componentId", "instancePath", "instanceData"],
+	props: ["componentId", "instancePath", "instanceData", "renderOnly"],
 	setup(props) {
 		const ss = inject(injectionKeys.core);
 		const ssbm = inject(injectionKeys.builderManager);
 		const componentId: Component["id"] = props.componentId;
 		const component = computed(() => ss.getComponentById(componentId));
+		const componentDefinition = ss.getComponentDefinitionById(componentId);
+		const allowedSlots = computed(() => [
+			...(componentDefinition.value.allowedSlots || []),
+			"default",
+		]);
 		const template = getTemplate(component.value.type);
 		const instancePath: InstancePath = props.instancePath;
 		const instanceData = props.instanceData;
@@ -45,6 +50,7 @@ export default {
 		const renderProxiedComponent = (
 			componentId: Component["id"],
 			instanceNumber: InstancePathItem["instanceNumber"] = 0,
+			ext: { class?: string } = {},
 		) => {
 			const vnode = h(ComponentProxy, {
 				componentId,
@@ -57,12 +63,21 @@ export default {
 					},
 				],
 				instanceData: [...instanceData, ref(null)],
+				...ext,
+				renderOnly: props.renderOnly || ext.renderOnly,
 			});
 			return vnode;
 		};
 
+		const getValidSlot = (childId: Component["id"]): string => {
+			const childDef = ss.getComponentDefinitionById(childId);
+			const slot = childDef.value.slot ?? "default";
+			return allowedSlots.value.includes(slot) ? slot : "default";
+		};
+
 		const getChildrenVNodes = (
 			instanceNumber: InstancePathItem["instanceNumber"] = 0,
+			slotName: string = "default",
 			componentFilter: (c: Component) => boolean = () => true,
 			positionlessSlot: boolean = false,
 		): VNode[] => {
@@ -75,7 +90,11 @@ export default {
 			const showSlots = isBeingEdited.value && !positionlessSlot;
 
 			const childrenVNodes = children.value
-				.filter(componentFilter)
+				.map((c) => ({ ...c, slot: getValidSlot(c.id) }))
+				.filter(
+					(c: Component & { slot: string }) => c.slot === slotName,
+				)
+				.filter((c) => componentFilter(c))
 				.map((childComponent, childIndex) => {
 					const childVNode = renderProxiedComponent(
 						childComponent.id,
@@ -260,7 +279,7 @@ export default {
 				},
 				...dataAttrs,
 				...(!isDisabled.value ? eventHandlerProps.value : []),
-				draggable: isBeingEdited.value,
+				draggable: !props.renderOnly && isBeingEdited.value,
 			};
 			return rootElProps;
 		};
@@ -272,10 +291,12 @@ export default {
 
 			const defaultSlotFn = ({
 				instanceNumber = 0,
+				slotName = "default",
 				componentFilter = () => true,
 				positionlessSlot = false,
 			}: {
 				instanceNumber: number;
+				slotName: string;
 				componentFilter: (c: Component) => boolean;
 				positionlessSlot: boolean;
 			}) => {
@@ -284,6 +305,7 @@ export default {
 				}
 				const vnodes = getChildrenVNodes(
 					instanceNumber,
+					slotName,
 					componentFilter,
 					positionlessSlot,
 				);

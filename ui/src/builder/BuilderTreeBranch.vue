@@ -9,6 +9,7 @@
 				matching: isMatching,
 			}"
 			:title="summaryText"
+			:data-branch-component-type="component.type"
 			:data-branch-component-id="componentId"
 			tabindex="0"
 			draggable="true"

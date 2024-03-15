@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ref, Ref } from "vue";
+import { ref, Ref, computed, isRef, ComputedRef } from "vue";
 import {
 	Component,
 	ComponentMap,
 	InstancePath,
 	MailItem,
 	UserFunction,
+	StreamsyncComponentDefinition,
 } from "../streamsyncTypes";
 import {
 	getSupportedComponentTypes,
@@ -23,6 +24,9 @@ const KEEP_ALIVE_DELAY_MS = 60000;
 export function generateCore() {
 	let sessionId: string = null;
 	const sessionTimestamp: Ref<number> = ref(null);
+	const componentDefinitionOverrides: Ref<
+		Partial<StreamsyncComponentDefinition>
+	> = ref({});
 	const mode: Ref<"run" | "edit"> = ref(null);
 	const runCode: Ref<string> = ref(null);
 	const components: Ref<ComponentMap> = ref({});
@@ -160,7 +164,7 @@ export function generateCore() {
 
 	function ingestComponents(newComponents: Record<string, any>) {
 		if (!newComponents) return;
-		components.value = newComponents
+		components.value = newComponents;
 	}
 
 	function clearFrontendMap() {
@@ -423,6 +427,7 @@ export function generateCore() {
 	}
 
 	function deleteComponent(componentId: Component["id"]) {
+		delete componentDefinitionOverrides.value[componentId];
 		delete components.value[componentId];
 	}
 
@@ -441,12 +446,12 @@ export function generateCore() {
 		and not the components it generated (Code-managed components, CMC).
  		*/
 
- 		const builderManagedComponents = {};
+		const builderManagedComponents = {};
 
- 		Object.entries(components.value).forEach(([componentId, component]) => {
- 			if (component.flag === 'cmc') return;
- 			builderManagedComponents[componentId] = component;
- 		});
+		Object.entries(components.value).forEach(([componentId, component]) => {
+			if (component.flag === "cmc") return;
+			builderManagedComponents[componentId] = component;
+		});
 
 		const payload = {
 			components: builderManagedComponents,
@@ -480,7 +485,7 @@ export function generateCore() {
 		do {
 			if (child.parentId == parentId) return true;
 			child = components.value[child.parentId];
-		} while(child);
+		} while (child);
 		return false;
 	}
 
@@ -540,6 +545,49 @@ export function generateCore() {
 		return userState.value;
 	}
 
+	function getComponentDefinitionById(
+		componentId: Component["id"] | Ref<Component["id"]>,
+	): ComputedRef<StreamsyncComponentDefinition> {
+		return computed(() => {
+			const id: Component["id"] = isRef(componentId)
+				? componentId.value
+				: componentId;
+			const component = components.value[id];
+			if (!component) return null;
+			return {
+				...getComponentDefinition(component.type),
+				...(componentDefinitionOverrides.value[id] || {}),
+			};
+		});
+	}
+
+	function setComponentDefinitionById(
+		componentId: Component["id"],
+		patch: Partial<StreamsyncComponentDefinition>,
+	) {
+		return (componentDefinitionOverrides.value[componentId] = patch);
+	}
+
+	function getInstancePath(componentId: Component["id"]): InstancePath {
+		const path = [];
+		let currentId = componentId;
+		while (currentId) {
+			const component = components.value[currentId];
+			path.unshift({ componentId: component.id, instanceNumber: 0 });
+			currentId = component.parentId;
+		}
+		return path;
+	}
+	function getComponentPageId(componentId: Component["id"]): Component["id"] {
+		let currentId = componentId;
+		while (currentId) {
+			const component = components.value[currentId];
+			if (component.type == "page") return component.id;
+			currentId = component.parentId;
+		}
+		return null;
+	}
+
 	const core = {
 		webSocket,
 		syncHealth,
@@ -567,6 +615,10 @@ export function generateCore() {
 		getSessionTimestamp,
 		getUserState,
 		isChildOf,
+		getComponentDefinitionById,
+		setComponentDefinitionById,
+		getInstancePath,
+		getComponentPageId,
 	};
 
 	return core;
