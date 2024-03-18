@@ -51,6 +51,8 @@ export type StreamsyncComponentDefinition = {
 	category?: string; // Category (Layout, Content, etc)
 	allowedChildrenTypes?: (string | "*" | "inherit")[]; // Which component types are allowed inside (if any)
 	allowedParentTypes?: string[]; // Which component types can contain this type of component
+	slot?: string;
+	allowedSlots?: string[];
 	fields?: Record<
 		string, // Id for the field
 		{

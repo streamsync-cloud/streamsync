@@ -1,10 +1,7 @@
 <template>
 	<div ref="rootEl" class="CorePage">
 		<div class="sidebarContainer">
-			<slot
-				:component-filter="(c: Component) => c.type == 'sidebar'"
-				:positionless-slot="true"
-			></slot>
+			<slot slot-name="sidebar" :positionless-slot="true"></slot>
 		</div>
 		<div
 			class="main"
@@ -14,15 +11,13 @@
 			}"
 			data-streamsync-container
 		>
-			<slot
-				:component-filter="(c: Component) => c.type != 'sidebar'"
-			></slot>
+			<slot></slot>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
-import { Component, FieldCategory, FieldType } from "../../streamsyncTypes";
+import { FieldCategory, FieldType } from "../../streamsyncTypes";
 import {
 	accentColor,
 	buttonColor,
@@ -90,6 +85,7 @@ export default {
 			},
 		},
 		description,
+		allowedSlots: ["sidebar"],
 		allowedChildrenTypes: ["*"],
 		allowedParentTypes: ["root"],
 		fields: {

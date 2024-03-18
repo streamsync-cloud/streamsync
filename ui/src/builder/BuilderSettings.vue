@@ -46,7 +46,7 @@
 
 		<div class="debug">
 			Component id:
-			{{ ssbm.getSelectedId() }}
+			<BuilderCopyText>{{ ssbm.getSelectedId() }}</BuilderCopyText>
 		</div>
 	</div>
 </template>
@@ -60,6 +60,7 @@ import BuilderSettingsHandlers from "./BuilderSettingsHandlers.vue";
 import BuilderSettingsProperties from "./BuilderSettingsProperties.vue";
 import BuilderSettingsBinding from "./BuilderSettingsBinding.vue";
 import BuilderSettingsVisibility from "./BuilderSettingsVisibility.vue";
+import BuilderCopyText from "./BuilderCopyText.vue";
 
 const ss = inject(injectionKeys.core);
 const ssbm = inject(injectionKeys.builderManager);
