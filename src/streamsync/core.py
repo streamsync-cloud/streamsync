@@ -4,6 +4,7 @@ import copy
 import datetime
 import inspect
 import logging
+import os.path
 import secrets
 import sys
 import time
@@ -59,6 +60,28 @@ class FileWrapper:
         else:
             raise ValueError("Invalid file.")
 
+class Logger:
+
+    @staticmethod
+    def debug(msg: str, *args, **kwargs):
+        if Config.logger is not None:
+            Config.logger.debug(msg, *args,  **kwargs)
+        else:
+            logging.debug(msg, *args,  **kwargs)
+
+    @staticmethod
+    def info(msg: str, *args, **kwargs):
+        if Config.logger is not None:
+            Config.logger.info(msg, *args, **kwargs)
+        else:
+            logging.info(msg, *args,  **kwargs)
+
+    @staticmethod
+    def warning(msg, *args, **kwargs):
+        if Config.logger is not None:
+            Config.logger.warning(msg, *args, **kwargs)
+        else:
+            logging.warning(msg, *args, **kwargs)
 
 class BytesWrapper:
 
@@ -1053,7 +1076,6 @@ class EventHandler:
                                              f"A runtime exception was raised when processing event '{ ev.type }'.", traceback.format_exc())
 
         return {"ok": ok, "result": result}
-
 
 state_serialiser = StateSerialiser()
 initial_state = StreamsyncState()

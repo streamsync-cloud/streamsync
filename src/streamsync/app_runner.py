@@ -13,7 +13,8 @@ import logging
 import logging.handlers
 from types import ModuleType
 import json
-from typing import Any, Callable, Dict, List, Optional, cast
+
+from typing import Callable, Dict, List, Optional, cast
 
 from watchdog.observers.polling import PollingObserver
 
@@ -80,7 +81,7 @@ class AppProcess(multiprocessing.Process):
         self.run_code = run_code
         self.bmc_components = bmc_components
         self.is_app_process_server_ready = is_app_process_server_ready
-        self.is_app_process_server_failed = is_app_process_server_failed 
+        self.is_app_process_server_failed = is_app_process_server_failed
         self.logger = logging.getLogger("app")
 
 

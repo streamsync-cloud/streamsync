@@ -173,3 +173,11 @@ Collect the files from `ui/custom_components_dist` and pack them in a folder suc
 ### Try them
 
 The folder containing the generated files, e.g. `my_custom_bubbles`, can now be placed in the `extensions/` folder of any Streamsync project. It'll be automatically detected during server startup.
+
+### Distribute your components
+
+You can distribute your components on pypi. For this to work, your project must contain a package whose name starts with `streamsync_` and this package must contain an ``extensions`` folder.
+
+The template [`FabienArcellier/streamsync_bubblemessage`](https://github.com/FabienArcellier/streamsync_bubblemessage/tree/master) provides a skeleton to simply create a package without needing to understand the details of compilation.
+
+come and promote your components on the [forum](https://github.com/streamsync-cloud/streamsync/discussions) or on [discord](https://discord.gg/sn677E3Pd3)
