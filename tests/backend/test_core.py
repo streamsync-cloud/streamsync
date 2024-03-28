@@ -19,7 +19,7 @@ import pyarrow as pa
 import urllib
 
 from pathlib import Path
-from tests import test_app_dir
+from tests.backend import test_app_dir
 
 raw_state_dict = {
     "name": "Robert",

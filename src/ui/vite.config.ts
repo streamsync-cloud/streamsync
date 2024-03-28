@@ -13,7 +13,7 @@ export default defineConfig({
 		STREAMSYNC_LIVE_CCT: JSON.stringify("no"),
 	},
 	build: {
-		outDir: "../src/streamsync/static",
+		outDir: "../streamsync/static",
 		emptyOutDir: true,
 	},
 	resolve: {

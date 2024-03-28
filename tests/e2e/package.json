@@ -1,0 +1,25 @@
+{
+  "name": "streamsync-e2e",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "e2e": "playwright test --project=chromium --reporter=list",
+    "e2e:ci": "playwright test",
+    "e2e:chromium": "playwright test --project=chromium",
+    "e2e:firefox": "playwright test --project=firefox",
+    "e2e:webkit": "playwright test --project=webkit",
+    "e2e:ui": "playwright test --project=chromium --ui"
+  },
+  "dependencies": {
+    "streamsync-cli": "*",
+    "streamsync-ui": "*",
+    "express": "4.18.2",
+    "http-proxy": "1.18.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.41.2",
+    "nodemon": "3.1.0"
+  }
+}

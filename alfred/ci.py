@@ -36,7 +36,7 @@ def ci_test():
 
 @alfred.command("ci.codegen.ui.binding", help="check if ui binding is up to date")
 def ci_codegen_ui_binding():
-    with _preserve_files(["src/streamsync/ui.py", "ui/components.json"]):
+    with _preserve_files(["src/streamsync/ui.py", "src/ui/components.json"]):
         _, original_diff, stderr = alfred.run("git diff  src/streamsync/ui.py", exit_on_error=False, stream_stdout=False)
         alfred.invoke_command("npm.codegen.binding.ui")
         _, final_diff, stderr = alfred.run("git diff  src/streamsync/ui.py", exit_on_error=False, stream_stdout=False)

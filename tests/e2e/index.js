@@ -194,4 +194,3 @@ server.on('upgrade', (req, socket, head) => {
 		console.error(e);
 	}
 });
-

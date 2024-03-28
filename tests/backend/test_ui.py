@@ -5,7 +5,7 @@ import streamsync as ss
 
 import json
 
-from tests import test_app_dir
+from tests.backend import test_app_dir
 
 sc = None
 with open(test_app_dir / "ui.json", "r") as f:

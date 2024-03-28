@@ -39,7 +39,7 @@ jobs:
         run: npm run build
 
       - name: Install E2E browsers
-        working-directory: e2e_tests
+        working-directory: e2e
         run: npx playwright install ${{ matrix.browser }} --with-deps
 
       - name: Run E2E tests

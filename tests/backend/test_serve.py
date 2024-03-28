@@ -7,7 +7,7 @@ import streamsync.serve
 import fastapi.testclient
 import pytest
 
-from tests import test_app_dir, test_multiapp_dir
+from tests.backend import test_app_dir, test_multiapp_dir
 
 
 class TestServe:

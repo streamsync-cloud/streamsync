@@ -8,7 +8,7 @@ from streamsync.ss_types import EventRequest, InitSessionRequest, InitSessionReq
 import asyncio
 import contextlib
 
-from tests import test_app_dir
+from tests.backend import test_app_dir
 
 
 @pytest.fixture
