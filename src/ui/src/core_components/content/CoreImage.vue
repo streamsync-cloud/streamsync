@@ -13,7 +13,16 @@ You can also use packed files or bytes:
 </docs>
 
 <template>
-	<div ref="rootEl" class="CoreImage" :style="rootStyle" @click="handleClick">
+	<div
+		ref="rootEl"
+		class="CoreImage"
+		:style="rootStyle"
+		@click="handleClick"
+		v-tooltip="{
+			content: fields.tooltip.value,
+			placement: fields.tooltipLocation.value,
+		}"
+	>
 		<img
 			:src="fields.src.value"
 			:alt="fields.caption.value"
@@ -64,6 +73,29 @@ export default {
 				init: "Image Caption",
 				desc: "Leave blank to hide.",
 				type: FieldType.Text,
+			},
+			tooltip: {
+				name: "Tooltip text",
+				type: FieldType.Text,
+			},
+			tooltipLocation: {
+				name: "Tooltip location",
+				type: FieldType.Text,
+				default: "top",
+				options: {
+					"top-start": "top-start",
+					top: "top",
+					"top-end": "top-end",
+					"right-start": "right-start",
+					right: "right",
+					"right-end": "right-end",
+					"bottom-end": "bottom-end",
+					bottom: "bottom",
+					"bottom-start": "bottom-start",
+					"left-end": "left-end",
+					left: "left",
+					"left-start": "left-start",
+				},
 			},
 			maxWidth: {
 				name: "Max width (px)",
@@ -145,5 +177,12 @@ img {
 	text-align: center;
 	font-size: 0.8rem;
 	margin-top: 8px;
+}
+</style>
+
+/* This is used for removing the arrow on the tooltip */
+<style>
+.v-popper__arrow-container {
+	display: none;
 }
 </style>

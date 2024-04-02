@@ -4,11 +4,13 @@ import injectionKeys from "./injectionKeys";
 import { generateCore } from "./core";
 import { generateBuilderManager } from "./builder/builderManager.js";
 import VueDOMPurifyHTML from "vue-dompurify-html";
+import FloatingVue from "floating-vue";
 
 /**
  * RemixIcon by remixicon.com
  */
 import "remixicon/fonts/remixicon.css";
+import 'floating-vue/dist/style.css';
 
 function setCaptureTabsDirective(app: App<Element>) {
 	app.directive("capture-tabs", {
@@ -51,6 +53,7 @@ async function load() {
 
 	const app = createApp(componentRenderer || builderApp);
 	app.use(VueDOMPurifyHTML);
+	app.use(FloatingVue);
 	app.provide(injectionKeys.core, ss);
 	app.provide(injectionKeys.builderManager, ssbm);
 	setCaptureTabsDirective(app);

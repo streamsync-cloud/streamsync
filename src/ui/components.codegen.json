@@ -356,6 +356,29 @@
         },
         "desc": "Disables all event handlers."
       },
+      "tooltip": {
+        "name": "Tooltip text",
+        "type": "Text"
+      },
+      "tooltipLocation": {
+        "name": "Tooltip location",
+        "type": "Text",
+        "default": "top",
+        "options": {
+          "top-start": "top-start",
+          "top": "top",
+          "top-end": "top-end",
+          "right-start": "right-start",
+          "right": "right",
+          "right-end": "right-end",
+          "bottom-end": "bottom-end",
+          "bottom": "bottom",
+          "bottom-start": "bottom-start",
+          "left-end": "left-end",
+          "left": "left",
+          "left-start": "left-start"
+        }
+      },
       "buttonColor": {
         "name": "Button",
         "type": "Color",
@@ -418,6 +441,29 @@
         "options": {
           "yes": "Yes",
           "no": "No"
+        }
+      },
+      "tooltip": {
+        "name": "Tooltip text",
+        "type": "Text"
+      },
+      "tooltipLocation": {
+        "name": "Tooltip location",
+        "type": "Text",
+        "default": "top",
+        "options": {
+          "top-start": "top-start",
+          "top": "top",
+          "top-end": "top-end",
+          "right-start": "right-start",
+          "right": "right",
+          "right-end": "right-end",
+          "bottom-end": "bottom-end",
+          "bottom": "bottom",
+          "bottom-start": "bottom-start",
+          "left-end": "left-end",
+          "left": "left",
+          "left-start": "left-start"
         }
       },
       "alignment": {
@@ -1228,6 +1274,29 @@
         "desc": "Leave blank to hide.",
         "type": "Text"
       },
+      "tooltip": {
+        "name": "Tooltip text",
+        "type": "Text"
+      },
+      "tooltipLocation": {
+        "name": "Tooltip location",
+        "type": "Text",
+        "default": "top",
+        "options": {
+          "top-start": "top-start",
+          "top": "top",
+          "top-end": "top-end",
+          "right-start": "right-start",
+          "right": "right",
+          "right-end": "right-end",
+          "bottom-end": "bottom-end",
+          "bottom": "bottom",
+          "bottom-start": "bottom-start",
+          "left-end": "left-end",
+          "left": "left",
+          "left-start": "left-start"
+        }
+      },
       "maxWidth": {
         "name": "Max width (px)",
         "type": "Number",
@@ -1508,6 +1577,29 @@
         "desc": "A RemixIcon id, such as \"arrow-up\".",
         "category": "Style",
         "default": "square-line"
+      },
+      "tooltip": {
+        "name": "Tooltip text",
+        "type": "Text"
+      },
+      "tooltipLocation": {
+        "name": "Tooltip location",
+        "type": "Text",
+        "default": "top",
+        "options": {
+          "top-start": "top-start",
+          "top": "top",
+          "top-end": "top-end",
+          "right-start": "right-start",
+          "right": "right",
+          "right-end": "right-end",
+          "bottom-end": "bottom-end",
+          "bottom": "bottom",
+          "bottom-start": "bottom-start",
+          "left-end": "left-end",
+          "left": "left",
+          "left-start": "left-start"
+        }
       },
       "size": {
         "name": "Icon size",

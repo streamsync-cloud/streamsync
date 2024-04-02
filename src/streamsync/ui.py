@@ -70,6 +70,8 @@ SidebarEventHandlers = TypedDict('SidebarEventHandlers', {
 ButtonProps = TypedDict('ButtonProps', {
     "text": str,
     "isDisabled": str,
+    "tooltip": str,
+    "tooltipLocation": str,
     "buttonColor": str,
     "buttonTextColor": str,
     "icon": str,
@@ -85,6 +87,8 @@ ButtonEventHandlers = TypedDict('ButtonEventHandlers', {
 TextProps = TypedDict('TextProps', {
     "text": str,
     "useMarkdown": str,
+    "tooltip": str,
+    "tooltipLocation": str,
     "alignment": str,
     "primaryTextColor": str,
     "cssClasses": str
@@ -268,6 +272,8 @@ SeparatorEventHandlers = TypedDict('SeparatorEventHandlers', {
 ImageProps = TypedDict('ImageProps', {
     "src": str,
     "caption": str,
+    "tooltip": str,
+    "tooltipLocation": str,
     "maxWidth": Union[float, str],
     "maxHeight": Union[float, str],
     "secondaryTextColor": str,
@@ -337,6 +343,8 @@ MapboxEventHandlers = TypedDict('MapboxEventHandlers', {
 
 IconProps = TypedDict('IconProps', {
     "icon": str,
+    "tooltip": str,
+    "tooltipLocation": str,
     "size": Union[float, str],
     "color": str,
     "cssClasses": str
