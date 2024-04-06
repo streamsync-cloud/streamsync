@@ -1,0 +1,916 @@
+{
+    "metadata": {
+        "streamsync_version": "0.2.8"
+    },
+    "components": {
+        "root": {
+            "id": "root",
+            "type": "root",
+            "content": {
+                "appName": "Hello"
+            },
+            "parentId": null,
+            "position": 0
+        },
+        "bb4d0e86-619e-4367-a180-be28ab6059f4": {
+            "id": "bb4d0e86-619e-4367-a180-be28ab6059f4",
+            "type": "page",
+            "content": {
+                "pageMode": "",
+                "key": "main"
+            },
+            "parentId": "root",
+            "position": 0
+        },
+        "84378aea-b64c-49a3-9539-f854532279ee": {
+            "id": "84378aea-b64c-49a3-9539-f854532279ee",
+            "type": "header",
+            "content": {
+                "text": "Hacker Pigeons",
+                "emptinessColor": "#ffffff"
+            },
+            "parentId": "bb4d0e86-619e-4367-a180-be28ab6059f4",
+            "position": 0
+        },
+        "92a2c0c8-7ab4-4865-b7eb-ed437408c8f5": {
+            "id": "92a2c0c8-7ab4-4865-b7eb-ed437408c8f5",
+            "type": "columns",
+            "content": {},
+            "parentId": "bb4d0e86-619e-4367-a180-be28ab6059f4",
+            "position": 1
+        },
+        "d1e01ce1-fab1-4a6e-91a1-1f45f9e57aa5": {
+            "id": "d1e01ce1-fab1-4a6e-91a1-1f45f9e57aa5",
+            "type": "column",
+            "content": {
+                "width": "1",
+                "isCollapsible": "",
+                "title": "",
+                "isSticky": "yes"
+            },
+            "parentId": "92a2c0c8-7ab4-4865-b7eb-ed437408c8f5",
+            "position": 0
+        },
+        "0569937e-c72c-4fb9-820e-2ae56e17bcc0": {
+            "id": "0569937e-c72c-4fb9-820e-2ae56e17bcc0",
+            "type": "column",
+            "content": {
+                "width": "1.61"
+            },
+            "parentId": "92a2c0c8-7ab4-4865-b7eb-ed437408c8f5",
+            "position": 1
+        },
+        "9c30af6d-4ee5-4782-9169-0f361d67fa76": {
+            "id": "9c30af6d-4ee5-4782-9169-0f361d67fa76",
+            "type": "section",
+            "content": {
+                "title": "",
+                "snapMode": ""
+            },
+            "parentId": "d1e01ce1-fab1-4a6e-91a1-1f45f9e57aa5",
+            "position": 0
+        },
+        "7fdd1d02-53de-4466-bd3c-4822cbc2694f": {
+            "id": "7fdd1d02-53de-4466-bd3c-4822cbc2694f",
+            "type": "image",
+            "content": {
+                "src": "static/pigeon1.jpg",
+                "caption": ""
+            },
+            "parentId": "9c30af6d-4ee5-4782-9169-0f361d67fa76",
+            "position": 0
+        },
+        "ee919cd6-8153-4f34-8c6a-bfc1153df360": {
+            "id": "ee919cd6-8153-4f34-8c6a-bfc1153df360",
+            "type": "tabs",
+            "content": {},
+            "parentId": "0569937e-c72c-4fb9-820e-2ae56e17bcc0",
+            "position": 0
+        },
+        "c6392876-7cfd-4680-8725-b04f43ff294f": {
+            "id": "c6392876-7cfd-4680-8725-b04f43ff294f",
+            "type": "tab",
+            "content": {
+                "name": "Data and Charts"
+            },
+            "parentId": "ee919cd6-8153-4f34-8c6a-bfc1153df360",
+            "position": 0
+        },
+        "da00a61f-0ee2-434e-acd6-228d32eae5c6": {
+            "id": "da00a61f-0ee2-434e-acd6-228d32eae5c6",
+            "type": "tab",
+            "content": {
+                "name": "Repeater"
+            },
+            "parentId": "ee919cd6-8153-4f34-8c6a-bfc1153df360",
+            "position": 2
+        },
+        "d0298b1c-7c64-4b58-a018-db97dd49675b": {
+            "id": "d0298b1c-7c64-4b58-a018-db97dd49675b",
+            "type": "separator",
+            "content": {},
+            "parentId": "c6392876-7cfd-4680-8725-b04f43ff294f",
+            "position": 3
+        },
+        "f1d6bc8e-a780-4ae5-8b7c-082fe8a6867d": {
+            "id": "f1d6bc8e-a780-4ae5-8b7c-082fe8a6867d",
+            "type": "dataframe",
+            "content": {
+                "dataframe": "@{main_df}",
+                "dataframeBackgroundColor": "#f5fdff",
+                "dataframeHeaderRowBackgroundColor": "#d0e6eb",
+                "showIndex": ""
+            },
+            "parentId": "c6392876-7cfd-4680-8725-b04f43ff294f",
+            "position": 4
+        },
+        "fbad9feb-5c88-4425-bb17-0d138286a875": {
+            "id": "fbad9feb-5c88-4425-bb17-0d138286a875",
+            "type": "sidebar",
+            "content": {
+                "startCollapsed": "yes"
+            },
+            "parentId": "bb4d0e86-619e-4367-a180-be28ab6059f4",
+            "position": -2
+        },
+        "7e625201-20c2-4b05-951c-d825de28b216": {
+            "id": "7e625201-20c2-4b05-951c-d825de28b216",
+            "type": "section",
+            "content": {
+                "title": "Filter data",
+                "snapMode": "no"
+            },
+            "parentId": "fbad9feb-5c88-4425-bb17-0d138286a875",
+            "position": 0
+        },
+        "385247e5-5c89-4352-a598-b8da81146a5a": {
+            "id": "385247e5-5c89-4352-a598-b8da81146a5a",
+            "type": "sliderinput",
+            "content": {
+                "label": "Minimum weight",
+                "minValue": "300",
+                "maxValue": "600",
+                "stepSize": "1"
+            },
+            "parentId": "7e625201-20c2-4b05-951c-d825de28b216",
+            "position": 1,
+            "handlers": {
+                "ss-number-change": "update"
+            },
+            "binding": {
+                "eventType": "ss-number-change",
+                "stateRef": "filter.min_weight"
+            }
+        },
+        "10c156df-7464-4889-8b69-1b54cb1ee80a": {
+            "id": "10c156df-7464-4889-8b69-1b54cb1ee80a",
+            "type": "sliderinput",
+            "content": {
+                "label": "Minimum length",
+                "minValue": "25",
+                "maxValue": "35",
+                "stepSize": "1"
+            },
+            "parentId": "7e625201-20c2-4b05-951c-d825de28b216",
+            "position": 0,
+            "handlers": {
+                "ss-number-change": "update"
+            },
+            "binding": {
+                "eventType": "ss-number-change",
+                "stateRef": "filter.min_length"
+            }
+        },
+        "70d82458-a08f-4005-8f96-dc8d3ba92fad": {
+            "id": "70d82458-a08f-4005-8f96-dc8d3ba92fad",
+            "type": "section",
+            "content": {
+                "title": "About this app",
+                "snapMode": "no"
+            },
+            "parentId": "fbad9feb-5c88-4425-bb17-0d138286a875",
+            "position": 1
+        },
+        "12e11005-3b5e-4bd8-9a8c-fc7b8cb757d0": {
+            "id": "12e11005-3b5e-4bd8-9a8c-fc7b8cb757d0",
+            "type": "text",
+            "content": {
+                "text": "This app is meant to serve as a lighthearted introduction to Streamsync. It's not a comprehensive demonstration of its capabilities."
+            },
+            "parentId": "70d82458-a08f-4005-8f96-dc8d3ba92fad",
+            "position": 0
+        },
+        "7b710d37-1c68-4d06-a65a-e6596ccc826a": {
+            "id": "7b710d37-1c68-4d06-a65a-e6596ccc826a",
+            "type": "text",
+            "content": {
+                "text": "In the bustling city, a hidden group of hacker pigeons works together to break into computer systems and create advanced data apps. These smart birds have different roles, like leaders, developers, security experts, and designers, and they use their skills to complete various tech challenges."
+            },
+            "parentId": "9c30af6d-4ee5-4782-9169-0f361d67fa76",
+            "position": 3
+        },
+        "b9cb10e5-1ead-448b-afcc-909e23afb72a": {
+            "id": "b9cb10e5-1ead-448b-afcc-909e23afb72a",
+            "type": "columns",
+            "content": {},
+            "parentId": "c6392876-7cfd-4680-8725-b04f43ff294f",
+            "position": 2
+        },
+        "31c1b0d5-bfb6-4304-82bd-1687d492f0a2": {
+            "id": "31c1b0d5-bfb6-4304-82bd-1687d492f0a2",
+            "type": "heading",
+            "content": {
+                "text": "Pigeon Power: Clever Birds Tackle Data Apps",
+                "alignment": "right",
+                "primaryTextColor": "#2fa0c6"
+            },
+            "parentId": "9c30af6d-4ee5-4782-9169-0f361d67fa76",
+            "position": 1
+        },
+        "804e15bf-11a7-463d-8082-f46ea3acac1b": {
+            "id": "804e15bf-11a7-463d-8082-f46ea3acac1b",
+            "type": "separator",
+            "content": {},
+            "parentId": "9c30af6d-4ee5-4782-9169-0f361d67fa76",
+            "position": 2
+        },
+        "3cc9c5e9-6c77-401d-ab82-7805d9df760c": {
+            "id": "3cc9c5e9-6c77-401d-ab82-7805d9df760c",
+            "type": "tab",
+            "content": {
+                "name": "Layout"
+            },
+            "parentId": "ee919cd6-8153-4f34-8c6a-bfc1153df360",
+            "position": 1
+        },
+        "fb22acfc-cdb5-44b6-9e97-76c3a51a8fff": {
+            "id": "fb22acfc-cdb5-44b6-9e97-76c3a51a8fff",
+            "type": "columns",
+            "content": {},
+            "parentId": "3cc9c5e9-6c77-401d-ab82-7805d9df760c",
+            "position": 0
+        },
+        "25dda22d-1b18-4584-aa99-aaae9f3b8edf": {
+            "id": "25dda22d-1b18-4584-aa99-aaae9f3b8edf",
+            "type": "column",
+            "content": {
+                "width": "1",
+                "verticalAlignment": "",
+                "isCollapsible": "yes",
+                "title": "Markdown"
+            },
+            "parentId": "fb22acfc-cdb5-44b6-9e97-76c3a51a8fff",
+            "position": 0
+        },
+        "b1ee642e-f2e7-453b-a6ef-3d96eea37140": {
+            "id": "b1ee642e-f2e7-453b-a6ef-3d96eea37140",
+            "type": "column",
+            "content": {
+                "title": "HTML Element",
+                "width": "1",
+                "isCollapsible": "",
+                "startCollapsed": "",
+                "horizontalAlignment": "center"
+            },
+            "parentId": "fb22acfc-cdb5-44b6-9e97-76c3a51a8fff",
+            "position": 2
+        },
+        "d1f43b6f-5b0f-4c8f-95bf-a92dd7ed723b": {
+            "id": "d1f43b6f-5b0f-4c8f-95bf-a92dd7ed723b",
+            "type": "text",
+            "content": {
+                "text": "\n## Role Distribution\n\nThe Hacker Pigeons _dataframe_ consists of five distinct roles:\n\n1. Leader\n2. Developer\n3. Data Expert\n4. Designer\n5. Security Expert\n\nThe **role distribution** among the hacker pigeons can be analysed to understand the composition of the secret society and the proportions of various roles.",
+                "useMarkdown": "yes"
+            },
+            "parentId": "25dda22d-1b18-4584-aa99-aaae9f3b8edf",
+            "position": 2
+        },
+        "71766c0c-e1e5-4675-9dd0-3aa2627773a0": {
+            "id": "71766c0c-e1e5-4675-9dd0-3aa2627773a0",
+            "type": "html",
+            "content": {
+                "styles": "{\n  \"padding\": \"16px\",\n  \"margin\": \"24px\",\n  \"min-height\": \"64px\",\n  \"min-width\": \"64px\",\n  \"max-width\": \"90%\",\n  \"border-radius\": \"8px\",\n  \"transform\": \"rotate(-3deg)\",\n  \"box-shadow\": \"0 4px 16px -8px black\"\n}"
+            },
+            "parentId": "b1ee642e-f2e7-453b-a6ef-3d96eea37140",
+            "position": 0
+        },
+        "c73602a6-453d-4ccf-b8e3-b1774ab4ff17": {
+            "id": "c73602a6-453d-4ccf-b8e3-b1774ab4ff17",
+            "type": "text",
+            "content": {
+                "text": "Use the HTML Element component when you need additional control."
+            },
+            "parentId": "71766c0c-e1e5-4675-9dd0-3aa2627773a0",
+            "position": 1
+        },
+        "573f095f-94a7-43e4-a94e-b2f69439a164": {
+            "id": "573f095f-94a7-43e4-a94e-b2f69439a164",
+            "type": "separator",
+            "content": {},
+            "parentId": "fb22acfc-cdb5-44b6-9e97-76c3a51a8fff",
+            "position": 1
+        },
+        "feedc43f-a7cf-499b-962e-8170f1032b69": {
+            "id": "feedc43f-a7cf-499b-962e-8170f1032b69",
+            "type": "text",
+            "content": {
+                "text": "You can use Markdown, as shown below."
+            },
+            "parentId": "25dda22d-1b18-4584-aa99-aaae9f3b8edf",
+            "position": 0
+        },
+        "1ee57415-557d-4529-be99-36f4d91fdf69": {
+            "id": "1ee57415-557d-4529-be99-36f4d91fdf69",
+            "type": "separator",
+            "content": {},
+            "parentId": "25dda22d-1b18-4584-aa99-aaae9f3b8edf",
+            "position": 1
+        },
+        "a36b75bc-58e6-48ba-bdef-0824e6b21e8d": {
+            "id": "a36b75bc-58e6-48ba-bdef-0824e6b21e8d",
+            "type": "html",
+            "content": {
+                "styles": "{\n  \"padding\": \"16px\",\n  \"margin\": \"24px\",\n  \"min-height\": \"64px\",\n  \"min-width\": \"64px\",\n  \"max-width\": \"90%\",\n  \"border-radius\": \"8px\",\n  \"transform\": \"rotate(3deg)\",\n  \"box-shadow\": \"0 4px 16px -8px black\"\n}"
+            },
+            "parentId": "b1ee642e-f2e7-453b-a6ef-3d96eea37140",
+            "position": 1
+        },
+        "5da5e007-d60a-4313-9d21-885deae7b37d": {
+            "id": "5da5e007-d60a-4313-9d21-885deae7b37d",
+            "type": "text",
+            "content": {
+                "text": "You can put other Streamsync components inside HTML Elements."
+            },
+            "parentId": "a36b75bc-58e6-48ba-bdef-0824e6b21e8d",
+            "position": 1
+        },
+        "85120b55-69c6-4b50-853a-bbbf73ff8121": {
+            "id": "85120b55-69c6-4b50-853a-bbbf73ff8121",
+            "type": "tab",
+            "content": {
+                "name": "Timer"
+            },
+            "parentId": "ee919cd6-8153-4f34-8c6a-bfc1153df360",
+            "position": 3
+        },
+        "db4c66d6-1eb7-44d3-a2d4-65d0b3e5cf12": {
+            "id": "db4c66d6-1eb7-44d3-a2d4-65d0b3e5cf12",
+            "type": "dataframe",
+            "content": {
+                "dataframe": "@{random_df}",
+                "fontStyle": "monospace"
+            },
+            "parentId": "85120b55-69c6-4b50-853a-bbbf73ff8121",
+            "position": 1
+        },
+        "09ddb2da-6fa3-4157-8da3-4d5d44a6a58d": {
+            "id": "09ddb2da-6fa3-4157-8da3-4d5d44a6a58d",
+            "type": "horizontalstack",
+            "content": {
+                "alignment": "left"
+            },
+            "parentId": "85120b55-69c6-4b50-853a-bbbf73ff8121",
+            "position": 0
+        },
+        "50a05488-d6fe-47bf-b681-36870d04f5d7": {
+            "id": "50a05488-d6fe-47bf-b681-36870d04f5d7",
+            "type": "timer",
+            "content": {
+                "intervalMs": "1000",
+                "isActive": ""
+            },
+            "parentId": "09ddb2da-6fa3-4157-8da3-4d5d44a6a58d",
+            "position": 0,
+            "handlers": {
+                "ss-tick": "handle_timer_tick"
+            }
+        },
+        "e296866a-75d2-4677-b55d-3c1456113b89": {
+            "id": "e296866a-75d2-4677-b55d-3c1456113b89",
+            "type": "text",
+            "content": {
+                "text": "Refreshing automatically using a timer."
+            },
+            "parentId": "09ddb2da-6fa3-4157-8da3-4d5d44a6a58d",
+            "position": 1
+        },
+        "fdf38e46-c01e-4a93-94d5-e187f9e4c823": {
+            "id": "fdf38e46-c01e-4a93-94d5-e187f9e4c823",
+            "type": "text",
+            "content": {
+                "text": "_pgcf_ stands for \"Pigeon Coefficient\" and is a meaningless, randomly-generated value.",
+                "useMarkdown": "yes",
+                "primaryTextColor": "#8a8a8a"
+            },
+            "parentId": "85120b55-69c6-4b50-853a-bbbf73ff8121",
+            "position": 2
+        },
+        "c921816d-6d45-4ce3-9c18-2c78ff850e0e": {
+            "id": "c921816d-6d45-4ce3-9c18-2c78ff850e0e",
+            "type": "html",
+            "content": {
+                "element": "img",
+                "styles": "{\n  \"filter\": \"hue-rotate(calc(80deg + @{hue_rotation}deg))\"\n}",
+                "attrs": "{ \"src\": \"static/pigeon1.jpg\"}"
+            },
+            "parentId": "71766c0c-e1e5-4675-9dd0-3aa2627773a0",
+            "position": 0
+        },
+        "c684f61e-0c79-4cb1-af9f-46c9cab5dfea": {
+            "id": "c684f61e-0c79-4cb1-af9f-46c9cab5dfea",
+            "type": "html",
+            "content": {
+                "element": "img",
+                "styles": "{\n  \"filter\": \"hue-rotate(calc(140deg + @{hue_rotation}deg))\"\n}",
+                "attrs": "{ \"src\": \"static/pigeon1.jpg\"}"
+            },
+            "parentId": "a36b75bc-58e6-48ba-bdef-0824e6b21e8d",
+            "position": 0
+        },
+        "ee82e035-cfb2-4d00-95ce-ccbb9eb2dbb9": {
+            "id": "ee82e035-cfb2-4d00-95ce-ccbb9eb2dbb9",
+            "type": "sliderinput",
+            "content": {
+                "label": "Hue rotation",
+                "minValue": "0",
+                "maxValue": "360",
+                "stepSize": "1"
+            },
+            "parentId": "b1ee642e-f2e7-453b-a6ef-3d96eea37140",
+            "position": 2,
+            "binding": {
+                "eventType": "ss-number-change",
+                "stateRef": "hue_rotation"
+            }
+        },
+        "c9bb4720-d07a-4fd8-bc53-5bda8dc64046": {
+            "id": "c9bb4720-d07a-4fd8-bc53-5bda8dc64046",
+            "type": "text",
+            "content": {
+                "text": "As shown above, you can use _HTML Element_ components together with state references.",
+                "useMarkdown": "yes"
+            },
+            "parentId": "b1ee642e-f2e7-453b-a6ef-3d96eea37140",
+            "position": 3
+        },
+        "6a490318-239e-4fe9-a56b-f0f33d628c87": {
+            "id": "6a490318-239e-4fe9-a56b-f0f33d628c87",
+            "type": "column",
+            "content": {
+                "width": "1"
+            },
+            "parentId": "b9cb10e5-1ead-448b-afcc-909e23afb72a",
+            "position": 2
+        },
+        "888b1eb9-609c-4205-bbda-262999d197ff": {
+            "id": "888b1eb9-609c-4205-bbda-262999d197ff",
+            "type": "separator",
+            "content": {},
+            "parentId": "b9cb10e5-1ead-448b-afcc-909e23afb72a",
+            "position": 1
+        },
+        "de70a15a-2ff6-42d2-ab12-c7fc9c3ed4e1": {
+            "id": "de70a15a-2ff6-42d2-ab12-c7fc9c3ed4e1",
+            "type": "heading",
+            "content": {
+                "text": "Highlighted Members",
+                "headingType": "h1",
+                "alignment": "center"
+            },
+            "parentId": "da00a61f-0ee2-434e-acd6-228d32eae5c6",
+            "position": 0
+        },
+        "2f4969e2-e248-43ed-9e63-222fc35250e2": {
+            "id": "2f4969e2-e248-43ed-9e63-222fc35250e2",
+            "type": "columns",
+            "content": {},
+            "parentId": "da00a61f-0ee2-434e-acd6-228d32eae5c6",
+            "position": 2
+        },
+        "f46cd60d-f01e-4390-a161-4353006b72a1": {
+            "id": "f46cd60d-f01e-4390-a161-4353006b72a1",
+            "type": "repeater",
+            "content": {
+                "repeaterObject": "@{highlighted_members}",
+                "keyVariable": "itemId",
+                "valueVariable": "item"
+            },
+            "parentId": "2f4969e2-e248-43ed-9e63-222fc35250e2",
+            "position": 0
+        },
+        "0dd29423-3867-478a-997e-eeaafb6b811e": {
+            "id": "0dd29423-3867-478a-997e-eeaafb6b811e",
+            "type": "column",
+            "content": {
+                "width": "1"
+            },
+            "parentId": "f46cd60d-f01e-4390-a161-4353006b72a1",
+            "position": 0
+        },
+        "2d326b15-da90-496e-86e8-7fdd4bcbe822": {
+            "id": "2d326b15-da90-496e-86e8-7fdd4bcbe822",
+            "type": "section",
+            "content": {
+                "title": "@{item.name} \u2b50\ufe0f",
+                "snapMode": "no",
+                "containerBackgroundColor": "#40687d",
+                "primaryTextColor": "#ffffff",
+                "containerShadow": "0px 4px 11px -6px #000000"
+            },
+            "parentId": "0dd29423-3867-478a-997e-eeaafb6b811e",
+            "position": 0
+        },
+        "7ea0d29a-5dca-4b6c-a067-322ccaee5032": {
+            "id": "7ea0d29a-5dca-4b6c-a067-322ccaee5032",
+            "type": "text",
+            "content": {
+                "text": "You can use a _Repeater_ component to repeat components, based on a dictionary.",
+                "useMarkdown": "yes"
+            },
+            "parentId": "2d326b15-da90-496e-86e8-7fdd4bcbe822",
+            "position": 4
+        },
+        "cd611ce2-f594-4b55-9932-d48e657b2e31": {
+            "id": "cd611ce2-f594-4b55-9932-d48e657b2e31",
+            "type": "text",
+            "content": {
+                "text": "**Role:** @{item.role}\n",
+                "useMarkdown": "yes"
+            },
+            "parentId": "2d326b15-da90-496e-86e8-7fdd4bcbe822",
+            "position": 1
+        },
+        "9d6ee245-b8f7-4391-9934-89598b7fa9f8": {
+            "id": "9d6ee245-b8f7-4391-9934-89598b7fa9f8",
+            "type": "separator",
+            "content": {},
+            "parentId": "2d326b15-da90-496e-86e8-7fdd4bcbe822",
+            "position": 0
+        },
+        "01c33c6e-3788-4b5d-b7aa-2addaa7b503f": {
+            "id": "01c33c6e-3788-4b5d-b7aa-2addaa7b503f",
+            "type": "text",
+            "content": {
+                "text": "The following Hacker Pigeons have made an impressive contribution this month.\nLet's come together to recognise and celebrate this success.",
+                "alignment": "center"
+            },
+            "parentId": "da00a61f-0ee2-434e-acd6-228d32eae5c6",
+            "position": 1
+        },
+        "e0e2391e-7bab-4c68-ad92-841942cb12fb": {
+            "id": "e0e2391e-7bab-4c68-ad92-841942cb12fb",
+            "type": "text",
+            "content": {
+                "text": "The ability @{item.name} demonstrated in @{item.specialty} has earned them this recognition.",
+                "useMarkdown": "yes"
+            },
+            "parentId": "2d326b15-da90-496e-86e8-7fdd4bcbe822",
+            "position": 2
+        },
+        "4ef4655b-45ca-495c-9f8d-fa1d7ae3565e": {
+            "id": "4ef4655b-45ca-495c-9f8d-fa1d7ae3565e",
+            "type": "separator",
+            "content": {},
+            "parentId": "2d326b15-da90-496e-86e8-7fdd4bcbe822",
+            "position": 3
+        },
+        "f67c98aa-3a7b-4f40-ac1f-0dd4aa06e22d": {
+            "id": "f67c98aa-3a7b-4f40-ac1f-0dd4aa06e22d",
+            "type": "plotlygraph",
+            "content": {
+                "spec": "@{scatter_chart}"
+            },
+            "parentId": "6a490318-239e-4fe9-a56b-f0f33d628c87",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "6d895924-e808-44aa-a119-f4e2d7f394f3": {
+            "id": "6d895924-e808-44aa-a119-f4e2d7f394f3",
+            "type": "column",
+            "content": {
+                "width": "1",
+                "verticalAlignment": "",
+                "horizontalAlignment": ""
+            },
+            "parentId": "b9cb10e5-1ead-448b-afcc-909e23afb72a",
+            "position": 0
+        },
+        "70bd9ea8-baa9-4e1d-bce5-deee6a3c5440": {
+            "id": "70bd9ea8-baa9-4e1d-bce5-deee6a3c5440",
+            "type": "plotlygraph",
+            "content": {
+                "spec": "@{role_chart}"
+            },
+            "parentId": "6d895924-e808-44aa-a119-f4e2d7f394f3",
+            "position": 0,
+            "handlers": {}
+        },
+        "8c8dd54f-af2c-4d6d-9603-dfea11cf326b": {
+            "id": "8c8dd54f-af2c-4d6d-9603-dfea11cf326b",
+            "type": "metric",
+            "content": {
+                "metricValue": "@{metrics.average_weight}gr",
+                "name": "Average weight",
+                "note": "@{metrics.average_weight_note}",
+                "description": ""
+            },
+            "parentId": "feb9ca67-6670-483d-a895-22b031426a13",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "1c05b2e7-3a31-40dd-b6b8-77ded7c6bc0f": {
+            "id": "1c05b2e7-3a31-40dd-b6b8-77ded7c6bc0f",
+            "type": "columns",
+            "content": {},
+            "parentId": "c6392876-7cfd-4680-8725-b04f43ff294f",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "feb9ca67-6670-483d-a895-22b031426a13": {
+            "id": "feb9ca67-6670-483d-a895-22b031426a13",
+            "type": "column",
+            "content": {
+                "width": "1"
+            },
+            "parentId": "1c05b2e7-3a31-40dd-b6b8-77ded7c6bc0f",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "3b325899-e560-40ea-ba54-9c55967af1e3": {
+            "id": "3b325899-e560-40ea-ba54-9c55967af1e3",
+            "type": "column",
+            "content": {
+                "width": "1"
+            },
+            "parentId": "1c05b2e7-3a31-40dd-b6b8-77ded7c6bc0f",
+            "position": 1,
+            "handlers": {},
+            "visible": true
+        },
+        "a0cd99db-0cbe-40ca-b9cb-b1670ec60dd8": {
+            "id": "a0cd99db-0cbe-40ca-b9cb-b1670ec60dd8",
+            "type": "column",
+            "content": {
+                "width": "1"
+            },
+            "parentId": "1c05b2e7-3a31-40dd-b6b8-77ded7c6bc0f",
+            "position": 2,
+            "handlers": {},
+            "visible": true
+        },
+        "5dcd137b-76bd-4a5f-ae5c-5b629035500e": {
+            "id": "5dcd137b-76bd-4a5f-ae5c-5b629035500e",
+            "type": "column",
+            "content": {
+                "width": "1"
+            },
+            "parentId": "1c05b2e7-3a31-40dd-b6b8-77ded7c6bc0f",
+            "position": 3,
+            "handlers": {},
+            "visible": true
+        },
+        "6a81f847-4d1d-4110-9cc1-12c716150e66": {
+            "id": "6a81f847-4d1d-4110-9cc1-12c716150e66",
+            "type": "metric",
+            "content": {
+                "metricValue": "@{metrics.average_length}cm",
+                "name": "Average length",
+                "note": "@{metrics.average_length_note}",
+                "description": ""
+            },
+            "parentId": "3b325899-e560-40ea-ba54-9c55967af1e3",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "8e54e9d2-a7c8-4f74-897f-fa5791cd82da": {
+            "id": "8e54e9d2-a7c8-4f74-897f-fa5791cd82da",
+            "type": "metric",
+            "content": {
+                "metricValue": "@{metrics.average_bmi}",
+                "name": "Average BMI",
+                "note": "@{metrics.average_bmi_note}",
+                "description": ""
+            },
+            "parentId": "a0cd99db-0cbe-40ca-b9cb-b1670ec60dd8",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "07f50628-4679-48a8-9a5d-07dcaf171afb": {
+            "id": "07f50628-4679-48a8-9a5d-07dcaf171afb",
+            "type": "metric",
+            "content": {
+                "metricValue": "@{metrics.diversity}",
+                "name": "Diversity Index",
+                "description": "",
+                "note": "@{metrics.diversity_note}"
+            },
+            "parentId": "5dcd137b-76bd-4a5f-ae5c-5b629035500e",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "4cca0893-5ad7-4152-b805-5c87babc4dee": {
+            "id": "4cca0893-5ad7-4152-b805-5c87babc4dee",
+            "type": "separator",
+            "content": {},
+            "parentId": "c6392876-7cfd-4680-8725-b04f43ff294f",
+            "position": 1,
+            "handlers": {},
+            "visible": true
+        },
+        "23bc1387-26ed-4ff2-8565-b027c2960c3c": {
+            "id": "23bc1387-26ed-4ff2-8565-b027c2960c3c",
+            "type": "page",
+            "content": {
+                "key": "story",
+                "buttonColor": "#242424",
+                "buttonTextColor": "#ffffff",
+                "containerBackgroundColor": "#383838",
+                "emptinessColor": "#474c4d",
+                "primaryTextColor": "#ffffff",
+                "separatorColor": "rgba(0, 0, 0, 0.2)"
+            },
+            "parentId": "root",
+            "position": 1,
+            "handlers": {},
+            "visible": true
+        },
+        "1d195388-35a3-43e1-b825-1d263b100a28": {
+            "id": "1d195388-35a3-43e1-b825-1d263b100a28",
+            "type": "header",
+            "content": {
+                "text": "Hacker Pigeons"
+            },
+            "parentId": "23bc1387-26ed-4ff2-8565-b027c2960c3c",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "771dc336-69b2-400e-9ea3-e881e2332c9d": {
+            "id": "771dc336-69b2-400e-9ea3-e881e2332c9d",
+            "type": "section",
+            "content": {
+                "title": "The story",
+                "snapMode": "no"
+            },
+            "parentId": "dfaae7f9-db20-4f70-a376-919bdc7b6010",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "9c77aee4-e2a0-4e8b-9c2b-377f939bb51e": {
+            "id": "9c77aee4-e2a0-4e8b-9c2b-377f939bb51e",
+            "type": "text",
+            "content": {
+                "text": "@{story.text}"
+            },
+            "parentId": "771dc336-69b2-400e-9ea3-e881e2332c9d",
+            "position": 1
+        },
+        "90fbfa9d-3178-4fc2-b445-c31e1acfa6a7": {
+            "id": "90fbfa9d-3178-4fc2-b445-c31e1acfa6a7",
+            "type": "button",
+            "content": {
+                "text": "Go back to the main page",
+                "icon": "arrow-go-back"
+            },
+            "parentId": "9bb8a686-7013-4af7-a89e-d89c7754120d",
+            "position": 0,
+            "handlers": {
+                "click": "$goToPage_main"
+            },
+            "visible": true
+        },
+        "8fe33adf-a5ea-4c7a-8d1d-59cc4dc14f05": {
+            "id": "8fe33adf-a5ea-4c7a-8d1d-59cc4dc14f05",
+            "type": "columns",
+            "content": {},
+            "parentId": "23bc1387-26ed-4ff2-8565-b027c2960c3c",
+            "position": 1,
+            "handlers": {},
+            "visible": true
+        },
+        "7402263c-cb8b-412d-b170-e6dc6ffcb706": {
+            "id": "7402263c-cb8b-412d-b170-e6dc6ffcb706",
+            "type": "column",
+            "content": {
+                "width": "1"
+            },
+            "parentId": "8fe33adf-a5ea-4c7a-8d1d-59cc4dc14f05",
+            "position": 1,
+            "handlers": {},
+            "visible": true
+        },
+        "dfaae7f9-db20-4f70-a376-919bdc7b6010": {
+            "id": "dfaae7f9-db20-4f70-a376-919bdc7b6010",
+            "type": "column",
+            "content": {
+                "width": "1"
+            },
+            "parentId": "8fe33adf-a5ea-4c7a-8d1d-59cc4dc14f05",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "5bc38721-8b48-43d5-a454-ee5ebe713a4c": {
+            "id": "5bc38721-8b48-43d5-a454-ee5ebe713a4c",
+            "type": "section",
+            "content": {
+                "title": "",
+                "snapMode": "",
+                "containerBackgroundColor": "#383838"
+            },
+            "parentId": "7402263c-cb8b-412d-b170-e6dc6ffcb706",
+            "position": 0
+        },
+        "42ab5c3d-21fc-4e88-befd-33e52fd15e8b": {
+            "id": "42ab5c3d-21fc-4e88-befd-33e52fd15e8b",
+            "type": "image",
+            "content": {
+                "src": "static/pigeon1.jpg",
+                "caption": ""
+            },
+            "parentId": "5bc38721-8b48-43d5-a454-ee5ebe713a4c",
+            "position": 0
+        },
+        "9bb8a686-7013-4af7-a89e-d89c7754120d": {
+            "id": "9bb8a686-7013-4af7-a89e-d89c7754120d",
+            "type": "horizontalstack",
+            "content": {
+                "alignment": "left"
+            },
+            "parentId": "771dc336-69b2-400e-9ea3-e881e2332c9d",
+            "position": 2,
+            "handlers": {},
+            "visible": true
+        },
+        "03f422ce-bc36-4000-8eb1-da1cc00948c9": {
+            "id": "03f422ce-bc36-4000-8eb1-da1cc00948c9",
+            "type": "button",
+            "content": {
+                "text": "Read the story",
+                "buttonShadow": "0px 4px 8px -8px #000000",
+                "icon": "book-2",
+                "buttonColor": "#34b9da",
+                "buttonTextColor": "#ffffff"
+            },
+            "parentId": "9c30af6d-4ee5-4782-9169-0f361d67fa76",
+            "position": 4,
+            "handlers": {
+                "click": "$goToPage_story"
+            },
+            "visible": true
+        },
+        "2df56a4b-b6e7-423d-a7a1-5d23c77f65fa": {
+            "id": "2df56a4b-b6e7-423d-a7a1-5d23c77f65fa",
+            "type": "heading",
+            "content": {
+                "text": "Each page can have its own style",
+                "alignment": "",
+                "primaryTextColor": "#ffb3fc"
+            },
+            "parentId": "5bc38721-8b48-43d5-a454-ee5ebe713a4c",
+            "position": 1
+        },
+        "1272b52c-d97c-4c20-ba6b-19abe1ec0abc": {
+            "id": "1272b52c-d97c-4c20-ba6b-19abe1ec0abc",
+            "type": "separator",
+            "content": {},
+            "parentId": "771dc336-69b2-400e-9ea3-e881e2332c9d",
+            "position": 0,
+            "handlers": {},
+            "visible": true
+        },
+        "77cb256b-ef12-4a55-a051-500497f41302": {
+            "id": "77cb256b-ef12-4a55-a051-500497f41302",
+            "type": "text",
+            "content": {
+                "text": "It's easy to switch between pages and it can be done from the frontend (via Streamsync Builder) and from the backend (via Python)."
+            },
+            "parentId": "5bc38721-8b48-43d5-a454-ee5ebe713a4c",
+            "position": 2,
+            "handlers": {},
+            "visible": true
+        },
+        "ed010441-0cac-4aa5-9e6f-97228e0c3536": {
+            "id": "ed010441-0cac-4aa5-9e6f-97228e0c3536",
+            "type": "button",
+            "content": {
+                "text": "Download this story",
+                "icon": "file-download"
+            },
+            "parentId": "9bb8a686-7013-4af7-a89e-d89c7754120d",
+            "position": 1,
+            "handlers": {
+                "click": "handle_story_download"
+            },
+            "visible": true
+        }
+    }
+}

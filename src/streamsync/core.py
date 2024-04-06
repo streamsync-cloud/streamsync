@@ -8,6 +8,7 @@ import io
 import json
 import logging
 import math
+import os.path
 import re
 import secrets
 import sys
@@ -86,6 +87,28 @@ class FileWrapper:
         else:
             raise ValueError("Invalid file.")
 
+class Logger:
+
+    @staticmethod
+    def debug(msg: str, *args, **kwargs):
+        if Config.logger is not None:
+            Config.logger.debug(msg, *args,  **kwargs)
+        else:
+            logging.debug(msg, *args,  **kwargs)
+
+    @staticmethod
+    def info(msg: str, *args, **kwargs):
+        if Config.logger is not None:
+            Config.logger.info(msg, *args, **kwargs)
+        else:
+            logging.info(msg, *args,  **kwargs)
+
+    @staticmethod
+    def warning(msg, *args, **kwargs):
+        if Config.logger is not None:
+            Config.logger.warning(msg, *args, **kwargs)
+        else:
+            logging.warning(msg, *args, **kwargs)
 
 class BytesWrapper:
 
@@ -1296,7 +1319,6 @@ class EventHandler:
 
         return {"ok": ok, "result": result}
 
-
 class DictPropertyProxy:
     """
     A descriptor based recipe that makes it possible to write shorthands
@@ -1362,6 +1384,112 @@ def new_initial_state(klass: Type[S], raw_state: dict) -> S:
     initial_state = klass(raw_state)
 
     return initial_state
+
+
+class ExtensionManager:
+    """
+    This manager manages streamsync extensions. It takes care of loading them when the application starts.
+    """
+
+    def __init__(self) -> None:
+        # fills when calling self.load_extensions
+        self.extensions: Optional[List[Tuple[Optional[str], str]]] = None
+
+    def load_extensions(self, user_app_path: str, modules_path: List[str]) -> None:
+        extensions: List[Tuple[Optional[str], str]] = []
+
+        for module_path in modules_path:
+            module_name: str = os.path.basename(module_path)
+            if module_name.startswith('streamsync_') and os.path.isdir(os.path.join(module_path, "extensions")):
+                extension_name = os.path.basename(module_path)
+                extension_path = os.path.realpath(os.path.join(module_path, "extensions"))
+                Logger.debug('Loading streamsync packages extension "%s" from "%s"', extension_name, extension_path)
+                extensions.append((extension_name, extension_path))
+
+        user_app_extensions_path = os.path.realpath(os.path.join(user_app_path, "extensions"))
+        if os.path.isdir(user_app_extensions_path):
+            Logger.debug(f'Loading user app extensions from "{user_app_extensions_path}"')
+            extensions.append((None, user_app_extensions_path))
+
+        # The order of loading the extensions is in the reverse order of the packages exposed by pkgutil
+        # The user's extensions are loaded last, and therefore overwrite the extensions.
+        #
+        # If 2 versions of an extension are present, the version of the virtual environment will be used.
+        self.extensions = list(reversed(extensions))
+
+    def extensions_list(self) -> List[Optional[str]]:
+        assert self.extensions is not None, 'Extensions must be loaded before calling this ExtensionManager.extensions_list'
+
+        return [extension[0] for extension in self.extensions]
+
+    def extensions_assets_urls(self) -> List[str]:
+        assert self.extensions is not None, 'Extensions must be loaded before calling this ExtensionManager.extensions_assets'
+
+        all_assets = []
+        extensions = self.extensions_list()
+        for extension in extensions:
+            all_assets += self.extension_assets_urls(extension)
+
+        return all_assets
+
+    def extension_assets_urls(self, extension_id: Optional[str]) -> List[str]:
+        """
+        Returns the urls of assets installed in an extension. Assets are the .css and .js files that package a component.
+
+        If the assets come from user space, the url is composed of 'filename'
+        If the assets come from a packaged extension, the url is composed of 'extension_package/filename'
+        """
+        assert self.extensions is not None, 'Extensions must be loaded before calling this ExtensionManager.extension_assets_urls'
+
+        assets_extensions = ['.css', '.js']
+        extension_path = [extension[1] for extension in self.extensions if extension[0] == extension_id]
+        if len(extension_path) > 1:
+            Logger.warning('Multiple extensions path with the same id %s', extension_path)
+
+        if len(extension_path) == 0:
+            return []
+
+        extension_path = extension_path[0]
+        assets = [elt for elt in os.listdir(extension_path) if os.path.splitext(elt)[1] in assets_extensions]
+
+        if extension_id is None:
+            # Handles the case of user extensions
+            return [f'{asset}' for asset in assets]
+        else:
+            # Handles the case of packaged extensions installed with pip
+            return [f'{extension_id}/{asset}' for asset in assets]
+
+    def extension_asset_from_url(self, url: str) -> Optional[str]:
+        """
+        Returns the asset name from an url.
+        """
+        assert self.extensions is not None, 'Extensions must be loaded before calling this ExtensionManager.extension_asset_from_url'
+
+        url_parts = url.split('/')
+        if len(url_parts) == 1:
+            extension_id = None
+            asset_file = url_parts[0]
+        elif len(url_parts) == 2:
+            extension_id, asset_file = url_parts
+        else:
+            Logger.warning('Application requests invalid asset url %s', url)
+            return None
+
+        extension_path = [extension[1] for extension in self.extensions if extension[0] == extension_id]
+        if len(extension_path) > 1:
+            Logger.warning('Multiple extensions path with the same id %s', extension_path)
+
+        if len(extension_path) == 0:
+            Logger.warning('Extension is missing: %s', extension_id)
+            return None
+
+        extension_path = extension_path[0]
+        asset_path = os.path.join(extension_path, asset_file)
+        if not os.path.isfile(asset_path):
+            Logger.warning('Asset is missing: %s', asset_path)
+            return None
+
+        return asset_path
 
 
 def session_verifier(func: Callable) -> Callable:

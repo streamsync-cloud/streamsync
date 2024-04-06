@@ -1,12 +1,15 @@
 import mimetypes
+import os
 
 import fastapi
 import fastapi.testclient
 import pytest
 import streamsync.serve
 from fastapi import FastAPI
+from streamsync.serve import ExtensionManager
 
 from tests.backend import test_app_dir, test_multiapp_dir
+from tests.fixtures.base import fixture
 
 
 class TestServe:
@@ -146,3 +149,143 @@ class TestServe:
                 })
                 with pytest.raises(fastapi.WebSocketDisconnect):
                     websocket.receive_json()
+
+
+class TestExtensionManager:
+
+    def test_load_extensions_load_the_extensions_from_user_extension_directory(self):
+        """
+        Extension manager should loads extensions from the directory extension in user application if it exists
+        """
+        # Arrange
+        app_dir = fixture('app_dir_with_extensions')
+        extension_manager = ExtensionManager()
+
+        # Act
+        extension_manager.load_extensions(app_dir, [])
+
+        # Assert
+        extensions = extension_manager.extensions_list()
+        assert len(extensions) == 1
+        assert extensions == [None]
+
+    def test_load_extensions_load_the_extensions_from_streamsync_extension_packages(self):
+        """
+        Extension manager should loads extensions from installed packaged that start with 'streamsync_' and contains a directory extension
+        """
+        # Arrange
+        app_dir = fixture('app_dir_with_extensions')
+        site_packages_dir = fixture('site_packages')
+        modules_dir = [os.path.join(site_packages_dir, directory) for directory in os.listdir(site_packages_dir)]
+        extension_manager = ExtensionManager()
+
+        # Act
+        extension_manager.load_extensions(app_dir, modules_dir)
+
+        # Assert
+        extensions = extension_manager.extensions_list()
+        assert len(extensions) == 2
+        assert extensions == [None, 'streamsync_demo']
+
+    def test_extensions_assets_urls_return_assets_urls_from_all_extensions(self):
+        """
+        Extension manager should return the urls of the assets from all extensions
+        """
+        # Arrange
+        app_dir = fixture('app_dir_with_extensions')
+        site_packages_dir = fixture('site_packages')
+        modules_dir = [os.path.join(site_packages_dir, directory) for directory in os.listdir(site_packages_dir)]
+        extension_manager = ExtensionManager()
+        extension_manager.load_extensions(app_dir, modules_dir)
+
+        # Act
+        assets_urls = extension_manager.extensions_assets_urls()
+
+        # Assert
+        assert len(assets_urls) == 4
+
+        assets_urls = sorted(assets_urls)
+        assert assets_urls == [
+            'component1.umd.js',
+            'streamsync_demo/component1.umd.js',
+            'streamsync_demo/style.css',
+            'style.css',
+        ]
+
+    def test_extension_assets_urls_return_urls_of_extension_assets_as_simple_file_for_the_user_extension_directory(self):
+        """
+        Extension manager should return the urls of the assets as simple file for the user extension directory
+        """
+        # Arrange
+        app_dir = fixture('app_dir_with_extensions')
+        extension_manager = ExtensionManager()
+        extension_manager.load_extensions(app_dir, [])
+
+        # Act
+        assets_urls = extension_manager.extension_assets_urls(None)
+
+        # Assert
+        assert len(assets_urls) == 2
+
+        assets_urls = sorted(assets_urls)
+        assert assets_urls == [
+            'component1.umd.js',
+            'style.css',
+        ]
+
+    def test_extension_assets_urls_return_urls_of_extension_assets_as_qualified_path_for_streamsync_extension_packages(self):
+        """
+        Extension manager should return the urls of the assets of a streamsync extension packages as qualified path
+        """
+        # Arrange
+        app_dir = fixture('app_dir_simple')
+        site_packages_dir = fixture('site_packages')
+        modules_dir = [os.path.join(site_packages_dir, directory) for directory in os.listdir(site_packages_dir)]
+        extension_manager = ExtensionManager()
+        extension_manager.load_extensions(app_dir, modules_dir)
+
+        # Act
+        assets_urls = extension_manager.extension_assets_urls('streamsync_demo')
+
+        # Assert
+        assert len(assets_urls) == 2
+
+        assets_urls = sorted(assets_urls)
+        assert assets_urls == [
+            'streamsync_demo/component1.umd.js',
+            'streamsync_demo/style.css',
+        ]
+
+    def test_extension_asset_from_url_should_return_the_path_of_the_asset_to_serve_it_as_file(self):
+        """
+        Extension manager should return the path of the asset. Fastapi will serve this file to the browser.
+        """
+        # Arrange
+        app_dir = fixture('app_dir_simple')
+        site_packages_dir = fixture('site_packages')
+        modules_dir = [os.path.join(site_packages_dir, directory) for directory in os.listdir(site_packages_dir)]
+        extension_manager = ExtensionManager()
+        extension_manager.load_extensions(app_dir, modules_dir)
+
+        # Act
+        asset_path = extension_manager.extension_asset_from_url('streamsync_demo/component1.umd.js')
+
+        # Assert
+        assert asset_path == os.path.join(site_packages_dir, 'streamsync_demo', 'extensions', 'component1.umd.js')
+
+    def test_extension_asset_from_url_return_none_when_asset_is_missing(self):
+        """
+        Extension manager should return None when required asset is missing. FastApi will raise 404 error on this.
+        """
+        # Arrange
+        app_dir = fixture('app_dir_simple')
+        site_packages_dir = fixture('site_packages')
+        modules_dir = [os.path.join(site_packages_dir, directory) for directory in os.listdir(site_packages_dir)]
+        extension_manager = ExtensionManager()
+        extension_manager.load_extensions(app_dir, modules_dir)
+
+        # Act
+        asset_path = extension_manager.extension_asset_from_url('streamsync_demo/component3.umd.js')
+
+        # Assert
+        assert asset_path is None
