@@ -28,6 +28,7 @@ const mapComponents = {
 	sliderinput: {locator: '.component.ss-type-sliderinput label'},
 	numberinput: {locator: '.component.ss-type-numberinput label'},
 	textinput: {locator: '.component.ss-type-textinput label'},
+	dropdowninput: {locator: '.component.ss-type-dropdowninput label'},
 }
 
 function findTest(component: Component) {

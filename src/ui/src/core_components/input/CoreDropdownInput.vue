@@ -84,7 +84,8 @@ const { formValue, handleInput } = useFormValueBroker(ss, instancePath, rootEl);
 
 <style scoped>
 @import "../../renderer/sharedStyles.css";
-.CoreSelectInput {
+
+.CoreDropdownInput {
 	width: fit-content;
 	max-width: 100%;
 }
@@ -99,5 +100,14 @@ select {
 
 .selectContainer {
 	margin-top: 8px;
+}
+
+.CoreColumn .CoreDropdownInput {
+	/* This is to match TextInput */
+	width: 70ch;
+}
+
+.CoreColumn select {
+	width: 100%;
 }
 </style>
