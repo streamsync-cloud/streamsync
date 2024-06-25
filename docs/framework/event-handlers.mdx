@@ -95,7 +95,7 @@ Note that for this "chain" to work, you need to import the final module in the s
 
 ## Mutating state
 
-In most cases, event handlers will modify the application state. State can be accessed by including the `state` argument in the handler, which will provide you with a `StreamsyncState` object for the session that invoked the handler.
+In most cases, event handlers will modify the application state. State can be accessed by including the `state` argument in the handler, which will provide you with a `WriterState` object for the session that invoked the handler.
 
 Elements of state can be reached using the square brackets syntax `state["my_element"]`. Accessing keys that don't exist will return `None`.
 

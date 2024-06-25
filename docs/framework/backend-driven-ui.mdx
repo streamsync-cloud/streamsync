@@ -98,7 +98,7 @@ with ui.find(container):
 
 ### Component methods
 
-UI manager contains methods linked to each front-end component. For example, in previous code snippets we provide a `ui.Text` method, which is used for creating [Text components](https://www.streamsync.cloud/component-list.html#text).
+UI manager contains methods linked to each front-end component. For example, in previous code snippets we provide a `ui.Text` method, which is used for creating [Text components](https://dev.writer.com/components/text).
 
 This method expects `content: dict` as first argument, which enables you to set the field properties of the component, through corresponding keys:
 ```python
@@ -147,7 +147,7 @@ In addition to `content`, a set of fields which is specific to the component typ
     </Note>
 - **`position: int`**: Determines the display order of the component in relation to its siblings.  
     Position `0` means that the component is the first child of its parent.  
-    Position `-2` is used for components – such as [sidebars](https://www.streamsync.cloud/component-list.html#sidebar) – that have a specific reserved position not related to their siblings.  
+    Position `-2` is used for components – such as [sidebars](https://dev.writer.com/components/sidebar) – that have a specific reserved position not related to their siblings.
     ```python
     ui.Text(
         {"text": "Hello Parent, I'm your first child!"}, 
@@ -170,7 +170,7 @@ In addition to `content`, a set of fields which is specific to the component typ
 
     ui.Text({"text": "My visibility depends on the @{my_var}!"}, visible="my_var")
     ```
-- **`handlers: dict[str, callable]`**: Attaches [event handlers](https://www.streamsync.cloud/event-handlers.html) to the component. Each dictionary key represents an event, and its value is the corresponding handler.:
+- **`handlers: dict[str, callable]`**: Attaches [event handlers](https://dev.writer.com/framework/event-handlersl) to the component. Each dictionary key represents an event, and its value is the corresponding handler.:
     ```python
     def increment(state):
         state["counter"] += 1
@@ -190,7 +190,7 @@ In addition to `content`, a set of fields which is specific to the component typ
     # Both approaches yield the same outcome.
     ```
     *A component can be linked to multiple event handlers.*
-- **`binding: dict[str, str]`**: Links the component to a state variable via [binding](https://www.streamsync.cloud/builder-basics.html#binding). The dictionary key is the bindable event, and the value is the state variable's name:
+- **`binding: dict[str, str]`**: Links the component to a state variable via [binding](https://dev.writer.com/framework/builder-basics#binding). The dictionary key is the bindable event, and the value is the state variable's name:
     ```python
     initial_state = wf.init_state({
         "header_text": "Default Text"

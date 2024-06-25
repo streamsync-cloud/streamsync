@@ -47,7 +47,7 @@ If you're a Docker expert, feel free to work on your own `Dockerfile`. Framework
 To build the image, use `docker build . -t ` followed by an image tag, which you're free to choose and will locally identify your image.
 
 ```sh
-docker build . -t my_streamsync_app
+docker build . -t my_writer_app
 ```
 
 <Warning> 
@@ -67,16 +67,16 @@ You can push your image using the following commands.
 docker login
 
 # Push the image
-# Replace "my_streamsync_app" for the tag you've previously chosen
+# Replace "my_writer_app" for the tag you've previously chosen
 # Replace "my_user" for your user on Docker Hub
-docker tag my_streamsync_app:latest my_user/my_streamsync_app:latest
-docker push my_user/my_streamsync_app:latest
+docker tag my_writer_app:latest my_user/my_writer_app:latest
+docker push my_user/my_writer_app:latest
 ```
 
 If your image is public, anyone can now run the following command and start the app. It's important to bind the port to a port in the host machine. The command below binds port 8080 in the Docker image to port 8080 in the host.
 
 ```sh
-docker run -p 8080:8080 my_user/my_streamsync_app
+docker run -p 8080:8080 my_user/my_writer_app
 ```
 
 Go on your browser to [http://localhost:8080](http://localhost:8080) to check everything is working as expected.

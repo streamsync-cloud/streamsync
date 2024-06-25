@@ -12,12 +12,12 @@ To get started, import your app's entry point, `main`. This will initialise stat
 
 ### Creating states
 
-For testing purposes, you can create your own state using the `StreamsyncState` class in `writer.core`. Pass a dictionary when constructing it.
+For testing purposes, you can create your own state using the `WriterState` class in `writer.core`. Pass a dictionary when constructing it.
 
 ```py
-from writer.core import StreamsyncState
+from writer.core import WriterState
 
-artificial_state = StreamsyncState({
+artificial_state = WriterState({
     "a": 3,
     "b": 6
 })

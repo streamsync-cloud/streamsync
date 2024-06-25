@@ -10,7 +10,7 @@ scenarios, while also allowing your IDE and toolchains to provide autocomplete a
 ```python
 import writer as wf
 
-class AppSchema(wf.StreamsyncState):
+class AppSchema(wf.WriterState):
     counter: int
 
 initial_state = wf.init_state({
@@ -50,7 +50,7 @@ Schema composition allows you to model a complex Application state.
 class MyappSchema(wf.State):
     title: str
 
-class AppSchema(wf.StreamsyncState):
+class AppSchema(wf.WriterState):
     my_app: MyappSchema
     counter: int
 
@@ -70,7 +70,7 @@ A schema allows you to specify that an attribute which contains a dictionary
 must be treated as a dictionary, rather than as a group of state.
 
 ```python
-class AppSchema(wf.StreamsyncState):
+class AppSchema(wf.WriterState):
     vegas_graph: dict
 
 # Without schema, this handler is execute only once
@@ -112,7 +112,7 @@ Here is the code, can you spot the error ?
 ```python
 import writer as wf
 
-class AppSchema(wf.StreamsyncState):
+class AppSchema(wf.WriterState):
     counter: int
 
 def increment(state: AppSchema):
