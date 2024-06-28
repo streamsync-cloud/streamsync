@@ -71,4 +71,4 @@ A function, in this example `handle_event`, should be implemented in your code t
 
 ## Reference
 
-* <a href="https://github.com/streamsync-cloud/streamsync/blob/dev/src/ui/{{fileRef}}" target="_blank" >Explore this component's source code on GitHub</a>
+* <a href="https://github.com/writer/writer-framework/blob/dev/src/ui/{{fileRef}}" target="_blank" >Explore this component's source code on GitHub</a>
