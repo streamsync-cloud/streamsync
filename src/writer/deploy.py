@@ -15,6 +15,7 @@ from gitignore_parser import parse_gitignore
 WRITER_DEPLOY_URL = os.getenv("WRITER_DEPLOY_URL", "https://api.writer.com/v1/deployment/apps")
 
 def deploy(path, token, env):
+    check_app(token)
     tar = pack_project(path)
     upload_package(tar, token, env)
 
@@ -89,6 +90,27 @@ def pack_project(path):
     f.flush()
 
     return f
+
+
+def check_app(token):
+    url = get_app_url(token)
+    if url:
+        print("[WARNING] This token was already used to deploy a different app")
+        print(f"[WARNING] URL: {url}")
+        print("[WARNING] If looking to deploy to a different URL, use a different API key. ")
+        if input("[WARNING] Are you sure you want to overwrite? (y/N)").lower() != "y":
+            sys.exit(1)
+
+def get_app_url(token):
+    with requests.get(WRITER_DEPLOY_URL, params={"lineLimit": 1}, headers={"Authorization": f"Bearer {token}"}) as resp:
+        try:
+            resp.raise_for_status()
+        except Exception as e:
+            print(e)
+            print(resp.json())
+            return None
+        data = resp.json()
+    return data['status']['url']
 
 def get_logs(token, params):
     with requests.get(WRITER_DEPLOY_URL, params = params, headers={"Authorization": f"Bearer {token}"}) as resp:
