@@ -93,21 +93,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, Ref, toRefs } from "vue";
-import { nextTick } from "vue";
-import { ref } from "vue";
-import { watch } from "vue";
+import { computed, nextTick, PropType, Ref, ref, toRefs, watch } from "vue";
 
 const emit = defineEmits(["change"]);
 
-const props = defineProps<{
-	baseId: string;
-	activeValue: any;
-	options: Record<string, string>;
-	maximumCount: number;
-	mode: "single" | "multiple";
-	placeholder?: string;
-}>();
+const props = defineProps({
+	baseId: { type: String, required: true },
+	activeValue: { required: true, validator: () => true },
+	options: {
+		type: Object as PropType<Record<string, string | number | undefined>>,
+		required: true,
+	},
+	maximumCount: { type: Number, required: true },
+	mode: { type: String as PropType<"single" | "multiple">, required: true },
+	placeholder: { type: String, required: false, default: undefined },
+});
 
 const { baseId, activeValue, options, maximumCount, mode, placeholder } =
 	toRefs(props);
@@ -131,8 +131,9 @@ const listOptions = computed(() => {
 			selectedOptions.value.includes(optionKey)
 		)
 			return;
+
 		if (
-			!option
+			!String(option)
 				.toLocaleLowerCase()
 				.includes(activeText.value.toLocaleLowerCase())
 		)
