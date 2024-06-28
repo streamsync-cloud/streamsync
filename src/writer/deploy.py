@@ -1,12 +1,15 @@
 import json
+import logging
 import os
+import re
 import sys
 import tarfile
 import tempfile
 import time
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Union
 
+import click
 import dateutil.parser
 import pytz
 import requests
@@ -14,15 +17,73 @@ from gitignore_parser import parse_gitignore
 
 WRITER_DEPLOY_URL = os.getenv("WRITER_DEPLOY_URL", "https://api.writer.com/v1/deployment/apps")
 
-def deploy(path, token, env):
-    tar = pack_project(path)
-    upload_package(tar, token, env)
+@click.group()
+def cloud():
+    """A group of commands to deploy the app"""
+    pass
 
-def undeploy(token):
+@cloud.command()
+@click.option('--api-key',
+    default=lambda: os.environ.get("WRITER_API_KEY", None),
+    allow_from_autoenv=True,
+    show_envvar=True,
+    envvar='WRITER_API_KEY',
+    prompt="Enter your API key",
+    hide_input=True, help="Writer API key"
+)
+@click.option('--env', '-e', multiple=True, default=[], help="Environment to deploy the app to")
+@click.option('--verbose', '-v', default=False, is_flag=True, help="Enable verbose mode")
+@click.argument('path')
+def deploy(path, api_key, env, verbose):
+    """Deploy the app from PATH folder."""
+
+    abs_path, is_folder = _get_absolute_app_path(path)
+    if not is_folder:
+        raise click.ClickException("A path to a folder containing a Writer Framework app is required. For example: writer cloud deploy my_app")
+
+    env = _validate_env_vars(env)
+    tar = pack_project(abs_path)
+    try:
+        upload_package(tar, api_key, env, verbose=verbose)
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 401:
+            unauthorized_error()
+        else:
+            on_error_print_and_raise(e.response, verbose=verbose)
+    except Exception as e:
+        print(e)
+        print("Error deploying app")
+        sys.exit(1)
+    finally:
+        tar.close()
+
+def _validate_env_vars(env: Union[List[str], None]) -> Union[List[str], None]:
+    if env is None:
+        return None
+    for var in env:
+        print(var)
+        regex = r"^[a-zA-Z_]+[a-zA-Z0-9_]*=.*$"
+        if not re.match(regex, var):
+            logging.error(f"Invalid environment variable: {var}, please use the format ENV_VAR=value")
+            sys.exit(1)
+    return env
+
+@cloud.command()
+@click.option('--api-key',
+    default=lambda: os.environ.get("WRITER_API_KEY", None),
+    allow_from_autoenv=True,
+    show_envvar=True,
+    envvar='WRITER_API_KEY',
+    prompt="Enter your API key",
+    hide_input=True, help="Writer API key"
+)
+@click.option('--verbose', '-v', default=False, is_flag=True, help="Enable verbose mode")
+def undeploy(api_key, verbose):
+    """Stop the app, app would not be available anymore."""
     try:
         print("Undeploying app")
-        with requests.delete(WRITER_DEPLOY_URL, headers={"Authorization": f"Bearer {token}"}) as resp:
-            resp.raise_for_status()
+        with requests.delete(WRITER_DEPLOY_URL, headers={"Authorization": f"Bearer {api_key}"}) as resp:
+            on_error_print_and_raise(resp, verbose=verbose)
             print("App undeployed")
             sys.exit(0)
     except Exception as e:
@@ -30,18 +91,30 @@ def undeploy(token):
         print(e)
         sys.exit(1)
 
-def runtime_logs(token):
+@cloud.command()
+@click.option('--api-key',
+    default=lambda: os.environ.get("WRITER_API_KEY", None),
+    allow_from_autoenv=True,
+    show_envvar=True,
+    envvar='WRITER_API_KEY',
+    prompt="Enter your API key",
+    hide_input=True, help="Writer API key"
+)
+@click.option('--verbose', '-v', default=False, is_flag=True, help="Enable verbose mode")
+def logs(api_key, verbose):
+    """Fetch logs from the deployed app."""
+
     try: 
         build_time = datetime.now(pytz.timezone('UTC')) - timedelta(days=4)
         start_time = build_time
         while True:
             prev_start = start_time
             end_time = datetime.now(pytz.timezone('UTC'))
-            data = get_logs(token, {
+            data = get_logs(api_key, {
                 "buildTime": build_time,
                 "startTime": start_time,
                 "endTime": end_time,
-            })
+            }, verbose=verbose)
             # order logs by date and print
             logs = data['logs']
             for log in logs:
@@ -90,13 +163,9 @@ def pack_project(path):
 
     return f
 
-def get_logs(token, params):
+def get_logs(token, params, verbose=False):
     with requests.get(WRITER_DEPLOY_URL, params = params, headers={"Authorization": f"Bearer {token}"}) as resp:
-        try:
-            resp.raise_for_status()
-        except Exception as e:
-            print(resp.json())
-            raise e
+        on_error_print_and_raise(resp, verbose=verbose)
         data = resp.json()
 
         logs = []
@@ -134,53 +203,59 @@ def dictFromEnv(env: List[str]) -> dict:
 
     return env_dict
 
-def upload_package(tar, token, env):
-    try: 
-        print("Uploading package to deployment server")
-        tar.seek(0)
-        files = {'file': tar}
-        start_time = datetime.now(pytz.timezone('UTC'))
-        build_time = start_time
-        with requests.post(
-            url = WRITER_DEPLOY_URL, 
-            headers = {
-                "Authorization": f"Bearer {token}",
-            },
-            files=files,
-            data={"envs": json.dumps(dictFromEnv(env))}
-        ) as resp:
-            try:
-                resp.raise_for_status()
-            except Exception as e:
-                print(resp.json())
-                raise e
-            data = resp.json()
-            build_id = data["buildId"]
 
-        print("Package uploaded. Building...")
-        status = "WAITING"
-        url = ""
-        while status not in ["COMPLETED", "FAILED"] and datetime.now(pytz.timezone('UTC')) < build_time + timedelta(minutes=5):
-            end_time = datetime.now(pytz.timezone('UTC'))
-            status, url = check_service_status(token, build_id, build_time, start_time, end_time, status)
-            time.sleep(5)
-            start_time = end_time
+def upload_package(tar, token, env, verbose=False):
+    print("Uploading package to deployment server")
+    tar.seek(0)
+    files = {'file': tar}
+    start_time = datetime.now(pytz.timezone('UTC'))
+    build_time = start_time
+    with requests.post(
+        url = WRITER_DEPLOY_URL, 
+        headers = {
+            "Authorization": f"Bearer {token}",
+        },
+        files=files,
+        data={"envs": json.dumps(dictFromEnv(env))}
+    ) as resp:
+        on_error_print_and_raise(resp, verbose=verbose)
+        data = resp.json()
+        build_id = data["buildId"]
 
-        if status == "COMPLETED":
-            print("Deployment successful")
-            print(f"URL: {url}")
-            sys.exit(0)
-        else:
-            time.sleep(5)
-            check_service_status(token, build_id, build_time, start_time, datetime.now(pytz.timezone('UTC')), status)
-            print("Deployment failed")
-            sys.exit(1)
+    print("Package uploaded. Building...")
+    status = "WAITING"
+    url = ""
+    while status not in ["COMPLETED", "FAILED"] and datetime.now(pytz.timezone('UTC')) < build_time + timedelta(minutes=5):
+        end_time = datetime.now(pytz.timezone('UTC'))
+        status, url = check_service_status(token, build_id, build_time, start_time, end_time, status)
+        time.sleep(5)
+        start_time = end_time
 
-    except Exception as e:
-        print("Error uploading package")
-        print(e)
+    if status == "COMPLETED":
+        print("Deployment successful")
+        print(f"URL: {url}")
+        sys.exit(0)
+    else:
+        time.sleep(5)
+        check_service_status(token, build_id, build_time, start_time, datetime.now(pytz.timezone('UTC')), status)
+        print("Deployment failed")
         sys.exit(1)
-    finally:
-        tar.close()
 
+def on_error_print_and_raise(resp, verbose=False):
+    try:
+        resp.raise_for_status()
+    except Exception as e:
+        if verbose:
+            print(resp.json())
+        raise e
 
+def unauthorized_error():
+    print(f"\n{WRITER_DEPLOY_URL}")
+    print("Unauthorized. Please check your API key.")
+    sys.exit(1)
+
+def _get_absolute_app_path(app_path: str):
+    is_path_absolute = os.path.isabs(app_path)
+    absolute_app_path = app_path if is_path_absolute else os.path.join(os.getcwd(), app_path)
+    is_path_folder = absolute_app_path is not None and os.path.isdir(absolute_app_path)
+    return absolute_app_path, is_path_folder

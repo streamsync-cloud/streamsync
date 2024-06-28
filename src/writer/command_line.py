@@ -1,133 +1,78 @@
-import argparse
-import getpass
 import logging
 import os
-import re
 import shutil
 import sys
-from typing import List, Optional, Union
+from typing import Optional
 
-import writer.deploy
+import click
+
 import writer.serve
+from writer.deploy import cloud
 
-
+CONTEXT_SETTINGS = {'help_option_names': ['-h', '--help']}
+@click.group(
+    context_settings=CONTEXT_SETTINGS,
+    help="Writer Framework CLI",
+)
+@click.version_option(None, '--version', '-v')
 def main():
-    parser = argparse.ArgumentParser(
-        description="Run, edit or create a Writer Framework app.")
-    parser.add_argument("command", choices=[
-                        "run", "edit", "create", "hello", "deploy", "undeploy", "deployment-logs"])
-    parser.add_argument(
-        "path", nargs="?", help="Path to the app's folder")
-    parser.add_argument(
-        "--port", help="The port on which to run the server.")
-    parser.add_argument(
-        "--api-key", help="The API key to use for deployment.")
-    parser.add_argument(
-        "--host", help="The host on which to run the server. Use 0.0.0.0 to share in your local network.")
-    parser.add_argument(
-        "--enable-remote-edit", help="Set this flag to allow non-local requests in edit mode.", action='store_true')
-    parser.add_argument(
-        "--enable-server-setup", help="Set this flag to enable server setup hook in edit mode.", action='store_true')
-    parser.add_argument(
-        "--template", help="The template to use when creating a new app.")
-    parser.add_argument(
-        "--env", nargs="*", help="Env variables for the deploy command in the format ENV_VAR=value.")
+    pass
 
-    args = parser.parse_args()
-    command = args.command
-    default_port = 3006 if command in ("edit", "hello") else 3005
-    enable_remote_edit = args.enable_remote_edit
-    enable_server_setup_hook = args.enable_server_setup
-    template_name = args.template
+@main.command()
+@click.option('--host', default="127.0.0.1", help="Host to run the app on")
+@click.option('--port', default=5000, help="Port to run the app on")
+@click.argument('path')
+def run(path, host, port):
+    """Run the app from PATH folder in run mode."""
 
-    port = int(args.port) if args.port else default_port
-    absolute_app_path = _get_absolute_app_path(
-        args.path) if args.path else None
-    host = args.host if args.host else None
-    api_key = args.api_key if args.api_key else None
+    abs_path, is_folder = _get_absolute_app_path(path)
+    if not is_folder:
+        raise click.ClickException("A path to a folder containing a Writer Framework app is required. For example: writer run my_app")
 
-    _perform_checks(command, absolute_app_path, host, enable_remote_edit, api_key)
-    api_key = _get_api_key(command, api_key)
-    env = _validate_env_vars(args.env)
-    _route(command, absolute_app_path, port, host, enable_remote_edit, enable_server_setup_hook, template_name, api_key, env)
+    writer.serve.serve(
+        abs_path, mode="run", port=port, host=host, enable_server_setup=True)
 
-def _validate_env_vars(env: Union[List[str], None]) -> Union[List[str], None]:
-    if env is None:
-        return None
-    for var in env:
-        regex = r"^[a-zA-Z_]+[a-zA-Z0-9_]*=.*$"
-        if not re.match(regex, var):
-            logging.error(f"Invalid environment variable: {var}, please use the format ENV_VAR=value")
-            sys.exit(1)
-    return env
+@main.command()
+@click.option('--host', default="127.0.0.1", help="Host to run the app on")
+@click.option('--port', default=5000, help="Port to run the app on")
+@click.option('--enable-remote-edit', help="Set this flag to allow non-local requests in edit mode.", is_flag=True)
+@click.option('--enable-server-setup', help="Set this flag to enable server setup hook in edit mode.", is_flag=True)
+@click.argument('path')
+def edit(path, port, host, enable_remote_edit, enable_server_setup):
+    """Run the app from PATH folder in edit mode."""
 
-def _get_api_key(command, api_key: Optional[str]) -> Optional[str]:
-    if command in ("deploy", "undeploy", "deployment-logs") and api_key is None:
-        env_key = os.getenv("WRITER_API_KEY", None)
-        if env_key is not None and env_key != "": 
-            return env_key
-        else:
-            logging.info("An API key is required to deploy a Writer Framework app.")
-            api_key = getpass.getpass(prompt='Enter your API key: ', stream=None)
-            if api_key is None or api_key == "":
-                logging.error("No API key provided. Exiting.")
-                sys.exit(1)
-            return api_key
-    else:
-        return api_key
+    abs_path, is_folder = _get_absolute_app_path(path)
+    if not is_folder:
+        raise click.ClickException("A path to a folder containing a Writer Framework app is required. For example: writer edit my_app")
 
+    writer.serve.serve(
+        abs_path, mode="edit", port=port, host=host,
+        enable_remote_edit=enable_remote_edit, enable_server_setup=enable_server_setup)
 
-def _perform_checks(command: str, absolute_app_path: str, host: Optional[str], enable_remote_edit: Optional[bool], api_key: Optional[str] = None):
-    is_path_folder = absolute_app_path is not None and os.path.isdir(absolute_app_path)
+@main.command()
+@click.argument('path', type=click.Path(exists=True, file_okay=False, dir_okay=True, resolve_path=True))
+@click.option('--template', help="The template to use when creating a new app.")
+def create(path, template):
+    """Create a new app in PATH folder."""
 
-    if command in ("run", "edit", "deploy") and is_path_folder is False:
-        logging.error("A path to a folder containing a Writer Framework app is required. For example: writer edit my_app")
-        sys.exit(1)
+    abs_path, _ = _get_absolute_app_path(path)
+    if abs_path is None:
+        raise click.ClickException("A target folder is required to create a Writer Framework app. For example: writer create my_app")
 
-    if command in ("create") and absolute_app_path is None:
-        logging.error("A target folder is required to create a Writer Framework app. For example: writer create my_app")
-        sys.exit(1)
+    create_app(abs_path, template_name=template)
 
-    if command in ("edit", "hello") and host is not None:
-        logging.warning("Writer Framework has been enabled in edit mode with a host argument\nThis is enabled for local development purposes (such as a local VM).\nDon't expose Builder to the Internet. We recommend using a SSH tunnel instead.")
+@main.command()
+@click.option('--host', default="127.0.0.1", help="Host to run the app on")
+@click.option('--port', default=5000, help="Port to run the app on")
+@click.option('--enable-remote-edit', help="Set this flag to allow non-local requests in edit mode.", is_flag=True)
+def hello(port, host, enable_remote_edit):
+    """Create and run a onboarding 'Hello' app."""
+    create_app("hello", template_name="hello", overwrite=True)
+    writer.serve.serve("hello", mode="edit",
+       port=port, host=host, enable_remote_edit=enable_remote_edit,
+       enable_server_setup=False)
 
-    if command in ("edit", "hello") and enable_remote_edit is True:
-        logging.warning("The remote edit flag is active. Builder will accept non-local requests. Please make sure the host is protected to avoid drive-by attacks.")
-
-
-def _route(
-    command: str,
-    absolute_app_path: str,
-    port: int,
-    host: Optional[str],
-    enable_remote_edit: Optional[bool],
-    enable_server_setup: Optional[bool],
-    template_name: Optional[str],
-    api_key: Optional[str] = None,
-    env: Union[List[str], None] = None
-):
-    if host is None:
-        host = "127.0.0.1"
-    if command in ("deploy"):
-        writer.deploy.deploy(absolute_app_path, api_key, env=env)
-    if command in ("undeploy"):
-        writer.deploy.undeploy(api_key)
-    if command in ("deployment-logs"):
-        writer.deploy.runtime_logs(api_key)
-    if command in ("edit"):
-        writer.serve.serve(
-            absolute_app_path, mode="edit", port=port, host=host,
-            enable_remote_edit=enable_remote_edit, enable_server_setup=enable_server_setup)
-    if command in ("run"):
-        writer.serve.serve(
-            absolute_app_path, mode="run", port=port, host=host, enable_server_setup=True)
-    elif command in ("hello"):
-        create_app("hello", template_name="hello", overwrite=True)
-        writer.serve.serve("hello", mode="edit",
-                               port=port, host=host, enable_remote_edit=enable_remote_edit,
-                               enable_server_setup=False)
-    elif command in ("create"):
-        create_app(absolute_app_path, template_name=template_name)
+main.add_command(cloud)
 
 def create_app(app_path: str, template_name: Optional[str], overwrite=False):
     if template_name is None:
@@ -149,15 +94,11 @@ def create_app(app_path: str, template_name: Optional[str], overwrite=False):
 
     shutil.copytree(template_path, app_path, dirs_exist_ok=True)
 
-
 def _get_absolute_app_path(app_path: str):
     is_path_absolute = os.path.isabs(app_path)
-    if is_path_absolute:
-        return app_path
-    else:
-        return os.path.join(os.getcwd(), app_path)
-
-
+    absolute_app_path = app_path if is_path_absolute else os.path.join(os.getcwd(), app_path)
+    is_path_folder = absolute_app_path is not None and os.path.isdir(absolute_app_path)
+    return absolute_app_path, is_path_folder
 
 if __name__ == "__main__":
     main()
