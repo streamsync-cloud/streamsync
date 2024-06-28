@@ -11,6 +11,7 @@ import os
 import signal
 import sys
 import threading
+import uuid
 from types import ModuleType
 from typing import Callable, Dict, List, Optional, cast
 
@@ -566,6 +567,7 @@ class AppRunner:
     MAX_WAIT_NOTIFY_SECONDS = 10
 
     def __init__(self, app_path: str, mode: str):
+        self.app_id: Optional[str] = None
         self.server_conn: Optional[multiprocessing.connection.Connection] = None
         self.client_conn: Optional[multiprocessing.connection.Connection] = None
         self.app_process: Optional[AppProcess] = None
@@ -684,6 +686,7 @@ class AppRunner:
                 if not isinstance(parsed_file, dict):
                     raise ValueError("No dictionary found in components file.")
                 file_payload = parsed_file
+                self.app_id = file_payload.get("metadata", {}).get("app_id", uuid.uuid4().hex)
         except FileNotFoundError:
             logging.error(
                 "Couldn't find ui.json in the path provided: %s.", self.app_path)
@@ -714,7 +717,8 @@ class AppRunner:
         self.bmc_components = payload.components
         file_contents = {
             "metadata": {
-                "writer_version": VERSION
+                "writer_version": VERSION,
+                "app_id": self.app_id
             },
             "components": payload.components
         }

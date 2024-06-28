@@ -46,6 +46,7 @@ uvicorn = ">= 0.20.0, < 1"
 watchdog = ">= 3.0.0, < 4"
 websockets = ">= 12, < 13"
 writer-sdk = ">= 0.1.2, < 1"
+platformdirs = "^4.2.2"
 
 
 [tool.poetry.group.build]
