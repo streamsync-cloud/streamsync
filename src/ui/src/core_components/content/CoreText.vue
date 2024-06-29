@@ -1,5 +1,11 @@
 <template>
-	<div ref="rootEl" class="CoreText" :style="rootStyle" @click="handleClick">
+	<div
+		v-if="isDisplayed"
+		ref="rootEl"
+		class="CoreText"
+		:style="rootStyle"
+		@click="handleClick"
+	>
 		<BaseMarkdown
 			v-if="fields.useMarkdown.value == 'yes'"
 			:raw-text="fields.text.value"
@@ -13,9 +19,9 @@
 </template>
 
 <script lang="ts">
-import { FieldCategory, FieldControl, FieldType } from "../../writerTypes";
 import { cssClasses, primaryTextColor } from "../../renderer/sharedStyleFields";
 import { getClick } from "../../renderer/syntheticEvents";
+import { FieldCategory, FieldControl, FieldType } from "../../writerTypes";
 import BaseMarkdown from "../base/BaseMarkdown.vue";
 
 const clickHandlerStub = `
@@ -28,6 +34,8 @@ def click_handler(state):
 const description =
 	"A component to display plain text or formatted text using Markdown syntax.";
 
+const emptyText = "(No text)";
+
 export default {
 	writer: {
 		name: "Text",
@@ -36,7 +44,7 @@ export default {
 		fields: {
 			text: {
 				name: "Text",
-				default: "(No text)",
+				default: emptyText,
 				init: "Text",
 				desc: "Add text directly, or reference state elements with @{my_text}.",
 				type: FieldType.Text,
@@ -83,7 +91,12 @@ import injectionKeys from "../../injectionKeys";
 const rootEl: Ref<HTMLElement> = ref(null);
 const fields = inject(injectionKeys.evaluatedFields);
 const componentId = inject(injectionKeys.componentId);
+const isBeingEdited = inject(injectionKeys.isBeingEdited);
 const wf = inject(injectionKeys.core);
+
+const isDisplayed = computed(
+	() => isBeingEdited.value || fields.text.value !== emptyText,
+);
 
 const rootStyle = computed(() => {
 	const component = wf.getComponentById(componentId);
