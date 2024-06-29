@@ -595,6 +595,23 @@ class TestEventDeserialiser:
         self.ed.transform(ev_valid)
         assert ev_valid.payload == "2019-11-23"
 
+    def test_time_change(self) -> None:
+        ev_invalid = WriterEvent(
+            type="wf-time-change",
+            instancePath=self.root_instance_path,
+            payload="virus"
+        )
+        with pytest.raises(RuntimeError):
+            self.ed.transform(ev_invalid)
+
+        ev_valid = WriterEvent(
+            type="wf-time-change",
+            instancePath=self.root_instance_path,
+            payload="23:59"
+        )
+        self.ed.transform(ev_valid)
+        assert ev_valid.payload == "23:59"
+
 
 class TestFileWrapper():
 

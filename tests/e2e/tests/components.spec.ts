@@ -26,6 +26,7 @@ const mapComponents = {
 	sidebar: {test: 'basic'},
 	fileinput: {locator: '.component.wf-type-fileinput label'},
 	dateinput: {locator: '.component.wf-type-dateinput label'},
+	timeinput: {locator: '.component.wf-type-timeinput label'},
 	sliderinput: {locator: '.component.wf-type-sliderinput label'},
 	numberinput: {locator: '.component.wf-type-numberinput label'},
 	textinput: {locator: '.component.wf-type-textinput label'},

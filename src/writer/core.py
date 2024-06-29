@@ -1053,6 +1053,19 @@ class EventDeserialiser:
 
         return payload
 
+    def _transform_time_change(self, ev) -> str:
+        payload = ev.payload
+
+        if not isinstance(payload, str):
+            raise ValueError("Time must be a string.")
+        try:
+            time.strptime(payload, '%H:%M')
+        except ValueError:
+            raise ValueError(
+                "Time must be in hh:mm format (in 24-hour format that includes leading zeros).")
+
+        return payload
+
     def _transform_change_page_size(self, ev) -> Optional[int]:
         try:
             return int(ev.payload)

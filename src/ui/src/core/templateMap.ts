@@ -26,6 +26,7 @@ import CoreSelectInput from "../core_components/input/CoreSelectInput.vue";
 import CoreSliderInput from "../core_components/input/CoreSliderInput.vue";
 import CoreTextInput from "../core_components/input/CoreTextInput.vue";
 import CoreTextareaInput from "../core_components/input/CoreTextareaInput.vue";
+import CoreTimeInput from "../core_components/input/CoreTimeInput.vue";
 import CoreRating from "../core_components/input/CoreRatingInput.vue";
 import CoreSwitchInput from "../core_components/input/CoreSwitchInput.vue";
 // layout
@@ -93,6 +94,7 @@ const templateMap = {
 	numberinput: CoreNumberInput,
 	sliderinput: CoreSliderInput,
 	dateinput: CoreDateInput,
+	timeinput: CoreTimeInput,
 	radioinput: CoreRadioInput,
 	checkboxinput: CoreCheckboxInput,
 	dropdowninput: CoreDropdownInput,
