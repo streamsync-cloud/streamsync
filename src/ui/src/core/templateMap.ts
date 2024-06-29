@@ -14,6 +14,7 @@ import CoreLink from "../core_components/content/CoreLink.vue";
 import CoreChatbot from "../core_components/content/CoreChatbot.vue";
 import CoreTags from "../core_components/content/CoreTags.vue";
 import CoreAvatar from "../core_components/content/CoreAvatar.vue";
+import CoreJsonViewer from "../core_components/content/CoreJsonViewer.vue";
 // input
 import CoreCheckboxInput from "../core_components/input/CoreCheckboxInput.vue";
 import CoreDateInput from "../core_components/input/CoreDateInput.vue";
@@ -113,12 +114,13 @@ const templateMap = {
 	switchinput: CoreSwitchInput,
 	reuse: CoreReuse,
 	avatar: CoreAvatar,
+	jsonviewer: CoreJsonViewer,
 };
 
 if (WRITER_LIVE_CCT === "yes") {
 	/*
 	Assigns the components in custom_components to the template map,
-	allowing for live updates when developing custom component templates. 
+	allowing for live updates when developing custom component templates.
 	*/
 
 	const liveCCT: Record<string, any> = (await import("../custom_components"))
