@@ -49,6 +49,7 @@
 							class="content"
 							:field-key="fieldKey"
 							:component-id="selectedComponent.id"
+							:instance-path="selectedInstancePath"
 						></BuilderFieldsKeyValue>
 
 						<BuilderFieldsText
@@ -118,19 +119,24 @@
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import BuilderFieldsKeyValue from "./BuilderFieldsKeyValue.vue";
-import { FieldType, FieldCategory } from "../writerTypes";
+import injectionKeys from "../injectionKeys";
+import { parseInstancePathString } from "../renderer/instancePath";
+import { FieldCategory, FieldType, InstancePath } from "../writerTypes";
+import BuilderFieldsAlign from "./BuilderFieldsAlign.vue";
 import BuilderFieldsColor from "./BuilderFieldsColor.vue";
+import BuilderFieldsKeyValue from "./BuilderFieldsKeyValue.vue";
+import BuilderFieldsObject from "./BuilderFieldsObject.vue";
+import BuilderFieldsPadding from "./BuilderFieldsPadding.vue";
 import BuilderFieldsShadow from "./BuilderFieldsShadow.vue";
 import BuilderFieldsText from "./BuilderFieldsText.vue";
-import BuilderFieldsObject from "./BuilderFieldsObject.vue";
 import BuilderFieldsWidth from "./BuilderFieldsWidth.vue";
-import BuilderFieldsAlign from "./BuilderFieldsAlign.vue";
-import BuilderFieldsPadding from "./BuilderFieldsPadding.vue";
-import injectionKeys from "../injectionKeys";
 
 const wf = inject(injectionKeys.core);
 const ssbm = inject(injectionKeys.builderManager);
+
+const selectedInstancePath = computed<InstancePath>(() =>
+	parseInstancePathString(ssbm.getSelection()?.instancePath),
+);
 
 const selectedComponent = computed(() => {
 	return wf.getComponentById(ssbm.getSelectedId());

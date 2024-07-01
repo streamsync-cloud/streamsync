@@ -75,29 +75,33 @@
 
 <script setup lang="ts">
 import {
+	PropType,
+	Ref,
+	computed,
+	inject,
 	nextTick,
 	onMounted,
-	Ref,
 	ref,
 	toRefs,
-	inject,
-	computed,
 	watch,
 } from "vue";
-import { Component } from "../writerTypes";
-import BuilderFieldsObject from "./BuilderFieldsObject.vue";
-import { useComponentActions } from "./useComponentActions";
 import injectionKeys from "../injectionKeys";
+import { useEvaluator } from "../renderer/useEvaluator";
+import type { InstancePath } from "../writerTypes";
+import BuilderFieldsObject from "./BuilderFieldsObject.vue";
 import BuilderTemplateInput from "./BuilderTemplateInput.vue";
+import { useComponentActions } from "./useComponentActions";
 
 const wf = inject(injectionKeys.core);
 const ssbm = inject(injectionKeys.builderManager);
 const { setContentValue } = useComponentActions(wf, ssbm);
 
-const props = defineProps<{
-	componentId: Component["id"];
-	fieldKey: string;
-}>();
+const props = defineProps({
+	componentId: { type: String, required: true },
+	fieldKey: { type: String, required: true },
+	instancePath: { type: Array as PropType<InstancePath>, required: true },
+});
+
 const { componentId, fieldKey } = toRefs(props);
 const component = computed(() => wf.getComponentById(componentId.value));
 
@@ -105,11 +109,17 @@ const rootEl: Ref<HTMLElement> = ref(null);
 const assistedKeyEl: Ref<HTMLInputElement> = ref(null);
 type Mode = "assisted" | "freehand";
 const mode: Ref<Mode> = ref(null);
-const assistedEntries: Ref<Record<string, string>> = ref({});
+const assistedEntries: Ref<Record<string, string | number | null>> = ref({});
 const formAdd: Ref<{ key: string; value: string }> = ref({
 	key: "",
 	value: "",
 });
+
+const { getEvaluatedFields } = useEvaluator(wf);
+
+const evaluatedValue = computed<Record<string, string | number | null>>(
+	() => getEvaluatedFields(props.instancePath)[fieldKey.value].value,
+);
 
 const setMode = async (newMode: Mode) => {
 	if (mode.value == newMode) return;
@@ -123,33 +133,13 @@ const setMode = async (newMode: Mode) => {
 };
 
 const handleSwitchToAssisted = () => {
-	let currentValue = component.value.content[fieldKey.value];
-
-	if (!currentValue) return;
-
-	let parsedValue: any;
-
-	// Attempt to populate assisted from existing JSON data
-
-	try {
-		parsedValue = JSON.parse(currentValue);
-		if (typeof parsedValue != "object") {
-			throw "Invalid structure.";
-		}
-		assistedEntries.value = parsedValue;
-	} catch {
-		component.value.content[fieldKey.value] = JSON.stringify(
-			assistedEntries.value,
-			null,
-			2,
-		);
-	}
+	assistedEntries.value = evaluatedValue.value ?? {};
 };
 
 const addAssistedEntry = () => {
 	const { key, value } = formAdd.value;
 	if (key === "" || value === "") return;
-	assistedEntries.value[key] = value;
+	assistedEntries.value = { ...assistedEntries.value, [key]: value };
 	setContentValue(
 		component.value.id,
 		fieldKey.value,
@@ -160,7 +150,9 @@ const addAssistedEntry = () => {
 };
 
 const removeAssistedEntry = (key: string) => {
-	delete assistedEntries.value[key];
+	const assistedEntriesCopy = assistedEntries.value;
+	delete assistedEntriesCopy[key];
+	assistedEntries.value = assistedEntriesCopy;
 
 	if (Object.keys(assistedEntries.value).length == 0) {
 		setContentValue(component.value.id, fieldKey.value, undefined);
@@ -179,39 +171,18 @@ const removeAssistedEntry = (key: string) => {
  */
 watch(
 	() => component.value?.content[fieldKey.value],
-	async (currentValue) => {
-		if (!component.value) return;
-		let parsedValue: any;
-
-		try {
-			parsedValue = JSON.parse(currentValue);
-			assistedEntries.value = parsedValue;
-		} catch {
-			// If parsing fails, preserve the previous assistedEntries value
-		}
+	async () => {
+		if (!component.value || !evaluatedValue.value) return;
+		assistedEntries.value = evaluatedValue.value;
 	},
 );
 
 onMounted(async () => {
-	const currentValue = component.value.content[fieldKey.value];
-	let parsedValue: any;
-
-	if (!currentValue) {
-		setMode("assisted");
-		return;
-	}
-
 	// Attempt assisted mode first, if the JSON can be parsed into an object
-
-	try {
-		parsedValue = JSON.parse(currentValue);
-		if (typeof parsedValue != "object") {
-			throw "Invalid structure.";
-		}
-		assistedEntries.value = parsedValue;
+	if (evaluatedValue.value) {
+		assistedEntries.value = evaluatedValue.value;
 		setMode("assisted");
-	} catch {
-		// Fall back to freehand if assisted mode isn't possible
+	} else {
 		setMode("freehand");
 	}
 });

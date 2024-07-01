@@ -1,28 +1,42 @@
 <script lang="ts">
-import { Ref, computed, h, inject, provide, ref, watch } from "vue";
+import {
+	PropType,
+	Ref,
+	VNode,
+	computed,
+	h,
+	inject,
+	provide,
+	ref,
+	watch,
+} from "vue";
 import { getTemplate } from "../core/templateMap";
+import injectionKeys from "../injectionKeys";
 import {
 	Component,
 	InstancePath,
 	InstancePathItem,
 	UserFunction,
 } from "../writerTypes";
-import ComponentProxy from "./ComponentProxy.vue";
-import { useEvaluator } from "./useEvaluator";
-import injectionKeys from "../injectionKeys";
-import { VNode } from "vue";
 import ChildlessPlaceholder from "./ChildlessPlaceholder.vue";
+import ComponentProxy from "./ComponentProxy.vue";
 import RenderError from "./RenderError.vue";
+import { flattenInstancePath } from "./instancePath";
+import { useEvaluator } from "./useEvaluator";
 
 export default {
-	props: ["componentId", "instancePath", "instanceData"],
+	props: {
+		componentId: { type: String, required: true },
+		instancePath: { type: Array as PropType<InstancePath>, required: true },
+		instanceData: { validator: () => true, required: true },
+	},
 	setup(props) {
 		const wf = inject(injectionKeys.core);
 		const ssbm = inject(injectionKeys.builderManager);
-		const componentId: Component["id"] = props.componentId;
+		const componentId = props.componentId;
 		const component = computed(() => wf.getComponentById(componentId));
 		const template = getTemplate(component.value.type);
-		const instancePath: InstancePath = props.instancePath;
+		const instancePath = props.instancePath;
 		const instanceData = props.instanceData;
 		const { getEvaluatedFields, isComponentVisible } = useEvaluator(wf);
 		const evaluatedFields = getEvaluatedFields(instancePath);
@@ -141,11 +155,6 @@ export default {
 			];
 		};
 
-		const flattenInstancePath = (path: InstancePath) => {
-			return path
-				.map((ie) => `${ie.componentId}:${ie.instanceNumber}`)
-				.join(",");
-		};
 		const flattenedInstancePath = flattenInstancePath(instancePath);
 
 		provide(injectionKeys.evaluatedFields, evaluatedFields);
@@ -153,7 +162,7 @@ export default {
 		provide(injectionKeys.isBeingEdited, isBeingEdited);
 		provide(injectionKeys.isDisabled, isDisabled);
 		provide(injectionKeys.instancePath, instancePath);
-		provide(injectionKeys.instanceData, instanceData);
+		provide(injectionKeys.instanceData, instanceData as any);
 		provide(injectionKeys.renderProxiedComponent, renderProxiedComponent);
 		provide(injectionKeys.getChildrenVNodes, getChildrenVNodes);
 		provide(injectionKeys.flattenedInstancePath, flattenedInstancePath);
